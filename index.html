@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ネイル予約 | YoruNail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- LIFF SDK -->
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+/* ============================================================
+   CSS — ベータ版 デモ用
+   40〜60代女性ターゲット: 大タップ領域・高コントラスト・温かみのある色調
+   ============================================================ */
+
+:root {
+  --primary: #c97b8b;
+  --primary-dark: #a8596d;
+  --primary-light: #f8e8ed;
+  --primary-pale: #fdf5f7;
+  --accent: #8b6f5e;
+  --accent-light: #f5efe9;
+  --bg: #faf7f5;
+  --bg-card: #ffffff;
+  --text: #2d2424;
+  --text-secondary: #6b5a5a;
+  --text-muted: #a89898;
+  --border: #ebe0db;
+  --border-light: #f2ece8;
+  --success: #4ea882;
+  --success-light: #eaf7f0;
+  --error: #d45858;
+  --error-light: #fdeaea;
+  --warning: #d4a04e;
+  --warning-light: #fef8ea;
+  --shadow-sm: 0 1px 4px rgba(50,30,30,0.06);
+  --shadow-md: 0 4px 16px rgba(50,30,30,0.08);
+  --shadow-lg: 0 8px 32px rgba(50,30,30,0.12);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  padding-bottom: calc(100px + var(--safe-bottom));
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* ── ヘッダー ── */
+.header {
+  background: linear-gradient(145deg, #d48a9a 0%, #b06578 50%, #9a5268 100%);
+  color: #fff;
+  padding: 16px 20px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 150px;
+  height: 150px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+.header-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.header .salon-name {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+.header h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.header-info {
+  font-size: 9px;
+  opacity: 0.9;
+  text-align: right;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+
+/* ── ステップバー ── */
+.step-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+.step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--border-light);
+  color: var(--text-muted);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.step-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.step-line {
+  width: 28px;
+  height: 2px;
+  background: var(--border-light);
+  margin: 0 6px;
+  transition: var(--transition);
+  border-radius: 1px;
+}
+.step-item.active .step-dot {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(201,123,139,0.4);
+  transform: scale(1.1);
+}
+.step-item.active .step-label { color: var(--primary-dark); }
+.step-item.done .step-dot {
+  background: var(--success);
+  color: #fff;
+}
+.step-item.done .step-label { color: var(--success); }
+.step-line.done { background: var(--success); }
+.step-line.active { background: var(--primary); }
+
+/* ── コンテナ ── */
+.container {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ── セクション ── */
+.section {
+  display: none;
+  opacity: 0;
+  transform: translateY(12px);
+}
+.section.visible {
+  display: block;
+  animation: sectionIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes sectionIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── カード ── */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: 16px 0;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+}
+.card-header {
+  padding: 16px 18px 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.card-icon.pink { background: var(--primary-light); }
+.card-icon.green { background: var(--success-light); }
+.card-icon.amber { background: var(--warning-light); }
+.card-icon.blue { background: #e8f0fd; }
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.card-body { padding: 8px 18px 18px; }
+
+/* ── メニューカード ── */
+.menu-list { display: flex; flex-direction: column; gap: 10px; }
+.menu-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.menu-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--primary-light);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.menu-card:active { transform: scale(0.98); }
+.menu-card.selected {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.menu-card.selected::before { opacity: 0; }
+.menu-card.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: grayscale(0.3);
+}
+.menu-check {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+  background: #fff;
+}
+.menu-card.selected .menu-check {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+.menu-check-icon {
+  font-size: 0.85rem;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s;
+}
+.menu-card.selected .menu-check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+.menu-content {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+.menu-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.menu-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.menu-price-area {
+  text-align: right;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.menu-price {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+.menu-duration {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.option-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 8px 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.option-hint .hint-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── カレンダー ── */
+.cal-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.cal-month-label {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cal-nav-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--primary-light);
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-dark);
+  transition: var(--transition);
+}
+.cal-nav-btn:active { transform: scale(0.92); background: var(--primary); color: #fff; }
+.cal-nav-btn:disabled { opacity: 0.25; pointer-events: none; }
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-dow {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 4px 0 8px;
+}
+.cal-dow:first-child { color: var(--error); }
+.cal-dow:last-child { color: #5580b8; }
+.cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  gap: 2px;
+}
+.cal-cell.empty { cursor: default; }
+.cal-cell.today {
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+.cal-cell.available {
+  background: var(--primary-pale);
+  color: var(--primary-dark);
+}
+.cal-cell.available:active {
+  background: var(--primary);
+  color: #fff;
+  transform: scale(0.92);
+}
+.cal-cell.selected {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(201,123,139,0.35);
+  transform: scale(1.05);
+}
+.cal-cell.unavailable {
+  color: var(--text-muted);
+  opacity: 0.4;
+  cursor: default;
+}
+.cal-cell .avail-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.cal-cell.selected .avail-dot { background: #fff; }
+.cal-cell.unavailable .avail-dot { display: none; }
+
+/* ── 時間帯 ── */
+.time-section { margin-top: 4px; }
+.time-date-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.time-chip {
+  padding: 13px 6px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.time-chip:active { transform: scale(0.95); }
+.time-chip.selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(201,123,139,0.3);
+}
+.no-slots-msg {
+  text-align: center;
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* ── フォーム ── */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--accent);
+}
+.form-required {
+  color: var(--error);
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 4px;
+  vertical-align: super;
+}
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fff;
+  color: var(--text);
+}
+.form-input:focus { border-color: var(--primary); }
+.form-input.has-error { border-color: var(--error); background: var(--error-light); }
+.form-error-msg {
+  color: var(--error);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 5px;
+  display: none;
+}
+
+/* ── 確認テーブル ── */
+.confirm-list { list-style: none; }
+.confirm-row {
+  display: flex;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border-light);
+  align-items: baseline;
+}
+.confirm-row:last-child { border-bottom: none; }
+.confirm-label {
+  width: 80px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.confirm-value {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.confirm-value.highlight {
+  color: var(--primary-dark);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ── フローティングバー ── */
+.float-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+  box-shadow: 0 -4px 24px rgba(50,30,30,0.1);
+  z-index: 100;
+  padding: 12px 16px calc(12px + var(--safe-bottom));
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.float-bar.show { transform: translateY(0); }
+.float-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.float-info {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+.float-menu {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.float-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  line-height: 1.3;
+}
+.float-duration {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.btn-main {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(168,89,109,0.3);
+  letter-spacing: 0.02em;
+}
+.btn-main:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(168,89,109,0.3); }
+.btn-main:disabled {
+  background: var(--border);
+  color: var(--text-muted);
+  box-shadow: none;
+  cursor: default;
+}
+.btn-main:disabled:active { transform: none; }
+
+/* ── ボトムシート ── */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  z-index: 200;
+  pointer-events: none;
+  transition: background 0.3s;
+}
+.sheet-backdrop.open {
+  background: rgba(0,0,0,0.35);
+  pointer-events: auto;
+}
+.sheet-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  max-height: 75vh;
+  overflow-y: auto;
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+  padding: 8px 20px calc(24px + var(--safe-bottom));
+}
+.sheet-panel.open { transform: translateY(0); }
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 8px auto 16px;
+}
+.sheet-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.sheet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.sheet-item-info .item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.sheet-item-info .item-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.btn-remove {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: var(--error);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.btn-remove:active { transform: scale(0.9); }
+
+/* ── 完了画面 ── */
+.done-icon {
+  text-align: center;
+  margin: 28px 0 4px;
+}
+.done-icon-circle {
+  display: inline-flex;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--success-light);
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  animation: popIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+}
+@keyframes popIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.done-title {
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--success);
+  margin: 12px 0 16px;
+}
+.notice-box {
+  background: var(--warning-light);
+  border: 2px solid #f0d48a;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 16px 0;
+}
+.notice-box h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #a07920;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.notice-box p {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #6b5520;
+}
+
+/* ── 戻るボタン ── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin: 16px 0 4px;
+  transition: var(--transition);
+}
+.btn-back:active { background: var(--border-light); }
+
+/* ── ローディング ── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(250,247,245,0.92);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  backdrop-filter: blur(4px);
+}
+.loading-overlay.show { display: flex; }
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ── トースト ── */
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  background: var(--error);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  z-index: 600;
+  transform: translateY(-120%);
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+  box-shadow: var(--shadow-lg);
+}
+.toast.show { transform: translateY(0); }
+
+/* ── デモバナー ── */
+.demo-badge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #2d2424, #4a3535);
+  color: #fff;
+  text-align: center;
+  padding: 6px 12px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  z-index: 999;
+}
+body { padding-top: 28px; }
+.step-bar { top: 28px; }
+
+/* ── アコーディオン ── */
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--primary-pale);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+}
+
+.accordion-header:active {
+  background: var(--primary-light);
+  transform: scale(0.98);
+}
+
+.accordion-header .accordion-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.accordion-header .accordion-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.accordion-header .accordion-arrow {
+  margin-left: 8px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.accordion-header[aria-expanded="true"] .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.accordion-header[aria-expanded="true"] ~ .accordion-content {
+  grid-template-rows: 1fr;
+}
+
+.accordion-content > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+
+/* ── メニューカード改善 ── */
+.menu-check {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.menu-check-icon {
+  font-size: 16px;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.menu-card.selected .menu-check {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  box-shadow: 0 4px 12px rgba(201, 123, 139, 0.35);
+  transform: scale(1.05);
+}
+
+.menu-card.selected .menu-check-icon {
+  color: white;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.menu-card {
+  animation: none;
+}
+
+.menu-card.selected {
+  animation: cardBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardBounce {
+  0% { transform: scale(0.98); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* 人気No.1バッジ */
+.menu-card[data-id="maoOnecolor"]::before {
+  content: '人気No.1';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #ff6b9d 0%, #c97b8b 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(201, 123, 139, 0.3);
+}
+
+
+/* ── カレンダー改善 ── */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary-pale) 0%, white 100%);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.calendar-nav button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.calendar-nav button:active {
+  background: var(--primary);
+  color: white;
+  transform: scale(0.95);
+}
+
+.calendar-month {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 8px 12px;
+  background: white;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 8px 0;
+  color: var(--text-secondary);
+}
+
+.weekday.sun { color: #d45858; }
+.weekday.sat { color: #5a7fb8; }
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 12px;
+  background: white;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  background: white;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.day::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  bottom: 2px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.day.available {
+  color: var(--primary-dark);
+}
+
+.day.available::after {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  opacity: 1;
+}
+
+.day.available:active {
+  transform: scale(0.95);
+}
+
+.day.disabled {
+  color: var(--text-muted);
+  background: var(--border-light);
+  cursor: not-allowed;
+}
+
+.day.today {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-pale) 100%);
+  border: 2px solid var(--primary);
+  font-weight: 700;
+}
+
+.day.today::before {
+  content: '今日';
+  position: absolute;
+  top: -18px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.day.selected {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(201, 123, 139, 0.35);
+}
+
+.day.rest::after {
+  display: none;
+}
+
+.day.rest {
+  position: relative;
+}
+
+.day.rest::before {
+  content: '定休';
+  position: absolute;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+
+/* ── 時間選択改善（AM/PM） ── */
+.time-section-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  padding: 12px 16px 8px;
+  background: var(--primary-pale);
+  margin-top: 12px;
+  border-radius: 8px;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: white;
+}
+
+.time-slot {
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: white;
+  position: relative;
+}
+
+.time-slot:active {
+  transform: scale(0.95);
+}
+
+.time-slot.available {
+  color: var(--primary-dark);
+}
+
+.time-slot.available:active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.time-slot.selected {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(201, 123, 139, 0.35);
+  animation: pulse 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(201, 123, 139, 0.35),
+                0 0 0 0 rgba(201, 123, 139, 0.5);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(201, 123, 139, 0.35),
+                0 0 0 8px rgba(201, 123, 139, 0);
+    transform: scale(1);
+  }
+}
+
+.time-slot.disabled {
+  color: var(--text-muted);
+  background: var(--border-light);
+  cursor: not-allowed;
+  border-color: var(--border);
+}
+
+
+/* ── フォーム入力改善 ── */
+.form-group {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 14px 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  transition: all 0.3s ease;
+  color: var(--text);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(201, 123, 139, 0.1);
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group label {
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  font-weight: 500;
+}
+
+.form-group input:focus ~ label,
+.form-group input:valid ~ label {
+  top: -6px;
+  left: 8px;
+  font-size: 0.8rem;
+  color: var(--primary);
+  background: white;
+  padding: 0 4px;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.form-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.validation-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.form-group input:valid ~ .validation-icon {
+  opacity: 1;
+  color: var(--success);
+}
+
+.form-repeater-note {
+  background: var(--success-light);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--success);
+  margin-top: 8px;
+  display: none;
+}
+
+.form-repeater-note.show {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ── 確認画面・完了画面改善 ── */
+.summary-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: var(--primary-pale);
+  border-radius: 10px;
+  border-left: 3px solid var(--primary);
+}
+
+.timeline-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-label {
+  font-size: 0.8rem;
+  color: var(--primary-dark);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timeline-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.summary-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--primary-pale) 100%);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.summary-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.summary-card-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.expandable-section {
+  margin-top: 16px;
+}
+
+.expandable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.expandable-header:active {
+  background: var(--primary-pale);
+  border-color: var(--primary);
+}
+
+.expandable-header .expand-arrow {
+  transition: transform 0.3s ease;
+  font-size: 14px;
+}
+
+.expandable-header[aria-expanded="true"] .expand-arrow {
+  transform: rotate(180deg);
+}
+
+.expandable-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.3s ease;
+  background: var(--primary-pale);
+  border: 1px solid var(--border-light);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.expandable-header[aria-expanded="true"] ~ .expandable-content {
+  grid-template-rows: 1fr;
+}
+
+.expandable-content > * {
+  overflow: hidden;
+  min-height: 0;
+  padding: 12px 14px;
+}
+
+.expandable-content ul {
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.expandable-content li::before {
+  content: '• ';
+  color: var(--primary);
+  font-weight: bold;
+  margin-right: 6px;
+}
+
+/* ── ローディングボタン ── */
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary.loading {
+  pointer-events: none;
+}
+
+.btn-primary.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 完了画面のコンフェッティ ── */
+@keyframes confetti-fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  pointer-events: none;
+  animation: confetti-fall 3s ease-out forwards;
+  z-index: 1000;
+}
+
+/* ── 完了画面ステータス ── */
+.completion-status {
+  text-align: center;
+  padding: 24px 16px;
+  background: linear-gradient(135deg, var(--success-light) 0%, white 100%);
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+
+.completion-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.completion-message {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.completion-detail {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.notification-info {
+  background: var(--warning-light);
+  padding: 12px 14px;
+  border-left: 3px solid var(--warning);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 12px;
+}
+
+
+/* ── フローティングバー改善 ── */
+.floating-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, white 0%, white 95%, rgba(255,255,255,0.95) 100%);
+  border-top: 1px solid var(--border-light);
+  padding: 12px 16px calc(12px + var(--safe-bottom));
+  box-shadow: 0 -4px 16px rgba(50,30,30,0.08);
+  z-index: 99;
+  max-width: 440px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.floating-menu-info {
+  flex: 1;
+  min-width: 0;
+  padding-right: 8px;
+}
+
+.floating-menu-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.floating-menu-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.floating-menu-name-marquee {
+  display: inline-block;
+  animation: marquee 15s linear infinite;
+  padding-right: 20px;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.floating-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.floating-bar button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.floating-bar button:active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: scale(0.95);
+}
+
+.floating-bar .btn-next {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  min-width: 80px;
+}
+
+.floating-bar .btn-next:active {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #8a4a5c 100%);
+  transform: scale(0.95);
+}
+
+.floating-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  transition: width 0.5s ease;
+}
+
+
+/* ── マイクロインタラクション ── */
+/* ページ遷移アニメーション */
+.section.visible {
+  animation: slideInRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.section.exit {
+  animation: slideOutLeft 0.3s cubic-bezier(0.6, 0.2, 0.8, 0.2) forwards;
+}
+
+@keyframes slideOutLeft {
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+/* トーストメッセージ */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(201, 123, 139, 0.3);
+  font-size: 0.9rem;
+  z-index: 1001;
+  animation: toastSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast.error {
+  background: var(--error);
+}
+
+.toast.success {
+  background: var(--success);
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* スケルトンローディング */
+.skeleton {
+  background: linear-gradient(90deg, var(--border-light) 25%, white 50%, var(--border-light) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.skeleton-title {
+  height: 20px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-text {
+  height: 16px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+/* 戻るボタン改善 */
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--primary-light);
+  border: none;
+  border-radius: 8px;
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.btn-back:active {
+  background: var(--primary-pale);
+  transform: translateX(-2px);
+}
+
+/* カード角丸統一 */
+.card {
+  border-radius: 16px;
+}
+
+/* シャドウ統一（掩えめに） */
+.card {
+  box-shadow: 0 2px 8px rgba(50, 30, 30, 0.06);
+  border: 1px solid var(--border-light);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(50, 30, 30, 0.08);
+}
+
+/* セクション間隔最適化 */
+.section {
+  padding: 16px 0;
+}
+
+.card {
+  margin: 12px 0;
+}
+
+/* Hapticフィードバック対応 */
+button, .menu-card, .day, .time-slot, .accordion-header {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 480px) {
+  .times {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .floating-bar button {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- デモバナー -->
+<div class="demo-badge">BETA DEMO — クライアントプレビュー版</div>
+
+<!-- ローディング -->
+<div id="loading" class="loading-overlay show">
+  <div class="spinner"></div>
+  <div class="loading-msg">読み込み中...</div>
+</div>
+
+<!-- トースト -->
+<div id="toast" class="toast"></div>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="header-content">
+    <div style="flex-grow: 1;">
+      <div class="salon-name">YORU NAIL</div>
+      <h1>✨ ご予約</h1>
+    </div>
+    <div class="header-info">
+      <div>10:00 - 18:00</div>
+      <div>定休: 土曜</div>
+    </div>
+  </div>
+</div>
+
+<!-- ステップバー -->
+<div class="step-bar">
+  <div class="step-item active" id="si1">
+    <span class="step-dot" id="sd1">1</span>
+    <span class="step-label">メニュー</span>
+  </div>
+  <div class="step-line" id="sl1"></div>
+  <div class="step-item" id="si2">
+    <span class="step-dot" id="sd2">2</span>
+    <span class="step-label">日時</span>
+  </div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step-item" id="si3">
+    <span class="step-dot" id="sd3">3</span>
+    <span class="step-label">確認</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ===== STEP 1: メニュー選択 ===== -->
+  <div id="sec1" class="section visible">
+
+    <!-- 人気メニュー（アコーディオン） -->
+    <div class="card">
+      <button class="accordion-header" aria-expanded="true" onclick="toggleAccordion(this)">
+        <div class="accordion-toggle">
+          <div class="card-icon pink">💅</div>
+          <span>人気メニュー</span>
+        </div>
+        <div class="accordion-badge">4</div>
+        <div class="accordion-arrow">▼</div>
+      </button>
+      <div class="accordion-content">
+      <div class="card-body">
+        <div class="menu-list">
+          <div class="menu-card" data-id="maoOnecolor" onclick="toggleMenu('maoOnecolor')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">マオジェル ワンカラー</div>
+              <div class="menu-desc">ドライケア込・フィルイン対応</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥8,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="magnetFlash" onclick="toggleMenu('magnetFlash')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">マグネット / フラッシュネイル</div>
+              <div class="menu-desc">トレンドのマグネットデザイン</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥7,980</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="simpleNail" onclick="toggleMenu('simpleNail')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">シンプルネイル</div>
+              <div class="menu-desc">オフィスにもぴったり</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥7,980</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="onecolor" onclick="toggleMenu('onecolor')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">ワンカラー</div>
+              <div class="menu-desc">ハンドジェルネイル・ドライケア込</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥7,700</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- マオジェルメニュー（アコーディオン） -->
+    <div class="card">
+      <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">
+        <div class="accordion-toggle">
+          <div class="card-icon amber">✨</div>
+          <span>マオジェルメニュー</span>
+        </div>
+        <div class="accordion-badge">7</div>
+        <div class="accordion-arrow">▼</div>
+      </button>
+      <div class="accordion-content">
+      <div class="card-body">
+        <div class="menu-list">
+          <div class="menu-card" data-id="maoSet" onclick="toggleMenu('maoSet')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">お得なマオセット</div>
+              <div class="menu-desc">ワンカラー＋スワロフスキーアート</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥10,500</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="maoFlower" onclick="toggleMenu('maoFlower')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">マオジェル 花びらネイル</div>
+              <div class="menu-desc">上品な花びらデザイン</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥11,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="maoLameFrench" onclick="toggleMenu('maoLameFrench')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">マオラメフレンチ</div>
+              <div class="menu-desc">キラキラのフレンチデザイン</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥11,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="maoShower" onclick="toggleMenu('maoShower')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">マオシャワー</div>
+              <div class="menu-desc">繲細なシャワーデザイン</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥12,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="maoGrain" onclick="toggleMenu('maoGrain')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">ひと粒置きネイル</div>
+              <div class="menu-desc">さりげないアクセント</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥10,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="maoMilkCafe" onclick="toggleMenu('maoMilkCafe')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">ミルグラ / カフェグラ</div>
+              <div class="menu-desc">グラデーションデザイン</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥11,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="maoKirabira" onclick="toggleMenu('maoKirabira')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">キラびらネイル</div>
+              <div class="menu-desc">華やかな輝き</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥10,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- デザインメニュー（アコーディオン） -->
+    <div class="card">
+      <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">
+        <div class="accordion-toggle">
+          <div class="card-icon blue">🎨</div>
+          <span>デザインメニュー</span>
+        </div>
+        <div class="accordion-badge">3</div>
+        <div class="accordion-arrow">▼</div>
+      </button>
+      <div class="accordion-content">
+      <div class="card-body">
+        <div class="menu-list">
+          <div class="menu-card" data-id="glassFrench" onclick="toggleMenu('glassFrench')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">yorunail風ガラスフレンチ</div>
+              <div class="menu-desc">当サロンオリジナルデザイン</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥9,900</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="select2art" onclick="toggleMenu('select2art')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">選べる2本アート</div>
+              <div class="menu-desc">お好きな2本にアートをプラス</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥8,000</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="tarashikomi" onclick="toggleMenu('tarashikomi')">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">たらしこみフラワー</div>
+              <div class="menu-desc">水彩風の繲細なフラワーアート</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">¥9,900</div>
+              <div class="menu-duration">90分</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- オフ -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">🔄</div>
+        <div class="card-title">オフ（付け替え時）</div>
+      </div>
+      <div class="card-body">
+        <div class="menu-list">
+          <div class="menu-card" data-id="offSelf" onclick="toggleMenu('offSelf')" id="mc-offSelf">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">自店オベ</div>
+              <div class="menu-desc">当サロンで付けたジェルのオフ</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">無料</div>
+              <div class="menu-duration">施術内</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="offOther" onclick="toggleMenu('offOther')" id="mc-offOther">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">他店オフ</div>
+              <div class="menu-desc">他サロンで付けたジェルのオフ</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">無料</div>
+              <div class="menu-duration">施術内</div>
+            </div>
+          </div>
+          <div class="menu-card" data-id="offLong" onclick="toggleMenu('offLong')" id="mc-offLong">
+            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
+            <div class="menu-content">
+              <div class="menu-name">他店オフ（長さ出し・スカルプ）</div>
+              <div class="menu-desc">ロングネイル等のオベ</div>
+            </div>
+            <div class="menu-price-area">
+              <div class="menu-price">+¥1,000</div>
+              <div class="menu-duration">施術内</div>
+            </div>
+          </div>
+        </div>
+        <div class="option-hint">
+          <span class="hint-icon">i</span>
+          メインメニューを選ぶとオフが選べます
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== STEP 2: 日時選択 ===== -->
+  <div id="sec2" class="section">
+    <button class="btn-back" onclick="goStep(1)">◀ メニュー選択に戻る</button>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">📅</div>
+        <div class="card-title">日付を選択</div>
+      </div>
+      <div class="card-body">
+        <div class="cal-nav-row">
+          <button class="cal-nav-btn" id="calPrev" onclick="navMonth(-1)">◀</button>
+          <div class="cal-month-label" id="calTitle"></div>
+          <button class="cal-nav-btn" id="calNext" onclick="navMonth(1)">▶</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div>
+
+    <div class="card" id="timeCard" style="display:none">
+      <div class="card-header">
+        <div class="card-icon green">🕐</div>
+        <div class="card-title" id="timeTitle">空き時間</div>
+      </div>
+      <div class="card-body time-section">
+        <div class="time-grid" id="timeGrid"></div>
+        <div class="no-slots-msg" id="noSlots" style="display:none">
+          この日は空きがありません<br>別の日をお選びください
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="custCard" style="display:none">
+      <div class="card-header">
+        <div class="card-icon amber">👤</div>
+        <div class="card-title">お客様情報</div>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">お名前<span class="form-required">必須</span></label>
+          <input class="form-input" type="text" id="inName" placeholder="山田 花子" autocomplete="name">
+          <div class="form-error-msg" id="errName">お名前を入力してください</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">電話番号<span class="form-required">必須</span></label>
+          <input class="form-input" type="tel" id="inPhone" placeholder="090-1234-5678" autocomplete="tel">
+          <div class="form-error-msg" id="errPhone">正しい電話番号を入力してください</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 3: 確認 ===== -->
+  <div id="sec3" class="section">
+    <button class="btn-back" onclick="goStep(2)">◀ 日時選択に戻る</button>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon pink">📋</div>
+        <div class="card-title">ご予約内容の確認</div>
+      </div>
+      <div class="card-body">
+        <ul class="confirm-list">
+          <li class="confirm-row"><span class="confirm-label">メニュー</span><span class="confirm-value" id="cfMenu"></span></li>
+          <li class="confirm-row"><span class="confirm-label">日時</span><span class="confirm-value" id="cfDate"></span></li>
+          <li class="confirm-row"><span class="confirm-label">所要時間</span><span class="confirm-value" id="cfDur"></span></li>
+          <li class="confirm-row"><span class="confirm-label">お名前</span><span class="confirm-value" id="cfName"></span></li>
+          <li class="confirm-row"><span class="confirm-label">電話番号</span><span class="confirm-value" id="cfPhone"></span></li>
+          <li class="confirm-row"><span class="confirm-label">合計金額</span><span class="confirm-value highlight" id="cfPrice"></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 完了 ===== -->
+  <div id="sec4" class="section">
+  <div class="container" style="padding-top: 24px;">
+    
+    <!-- 完了ステータス -->
+    <div class="completion-status">
+      <div class="completion-icon">✨</div>
+      <div class="completion-message">ご予約ありがとうございます</div>
+      <div class="completion-detail">確認メールをお送りしました</div>
+    </div>
+    
+    <!-- 予約サマリー -->
+    <div class="summary-card">
+      <div class="summary-card-title">📅 予約日時</div>
+      <div class="summary-card-value" id="summaryDate">日時を確認してください</div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="summary-card-title">💅 メニュー</div>
+      <div class="summary-card-value" id="summaryMenu">メニュー</div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="summary-card-title">💰 予約金額</div>
+      <div class="summary-card-value" id="summaryPrice">¥0</div>
+    </div>
+    
+    <!-- LINE通知案内 -->
+    <div class="notification-info">
+      📱 LINE通知が届きます。予約変更・キャンセルはLINEからお手続きください。
+    </div>
+    
+    <!-- キャンセルポリシー（エキスパンダブル） -->
+    <div class="expandable-section" style="margin-top: 20px;">
+      <button class="expandable-header" onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true')">
+        キャンセルポリシー
+        <span class="expand-arrow">▼</span>
+      </button>
+      <div class="expandable-content">
+        <ul>
+          <li>予約前日から3日以内のキャンセルはキャンセル料が発生します</li>
+          <li>前日キャンセル：50%、当日キャンセル：100%</li>
+          <li>ご不明な点はお電話でお啪い合わせください</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- アクション ボタン -->
+    <div style="margin-top: 24px; display: flex; gap: 12px; margin-bottom: 20px;">
+      <button class="btn-primary" onclick="goStep(1)" style="background: white; color: var(--primary); border: 1.5px solid var(--primary); flex: 1;">
+        新しい予約を作成
+      </button>
+      <button class="btn-primary" style="flex: 1;" onclick="window.location.href='/'">
+        ホームに戻る
+      </button>
+    </div>
+    
+  </div>
+</div>
+
+<!-- フローティングバー -->
+<div class="floating-bar">
+  <div class="floating-menu-info">
+    <div class="floating-menu-label">選択メニュー</div>
+    <div class="floating-menu-name">メニューを選択</div>
+  </div>
+  <div class="floating-buttons">
+    <button class="btn-next" onclick="goStep(step + 1)">次へ</button>
+  </div>
+  <div class="floating-progress"></div>
+</div>
+    <button class="btn-main" id="btnNext" disabled onclick="onNext(event)">次へ</button>
+  </div>
+</div>
+
+<!-- ボトムシート -->
+<div id="sheetBg" class="sheet-backdrop" onclick="closeSheet()"></div>
+<div id="sheetPanel" class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">選択中のメニュー</div>
+  <div id="sheetItems"></div>
+</div>
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<script>
+'use strict';
+
+// ── 設定（デプロイ前に埋める） ──
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwI9uvlhv6pFP6HyxwSKB5PBRV52rWz5eCo9kctBhYcR8RqD3uNOvaRJ53j3AZ5Nhno/exec';
+var LIFF_ID = '2009489511-RWe0J1qP';
+
+// ── メニュー定義 ──
+var M = {
+  // 人気メニュー
+  maoOnecolor:   { name:'マオジェル ワンカラー',       dur:90, price:8000,  type:'main' },
+  magnetFlash:   { name:'マグネット/フラッシュネイル',   dur:90, price:7980,  type:'main' },
+  simpleNail:    { name:'シンプルネイル',               dur:90, price:7980,  type:'main' },
+  onecolor:      { name:'ワンカラー',                  dur:90, price:7700,  type:'main' },
+  // マオジェルメニュー
+  maoSet:        { name:'お得なマオセット',             dur:90, price:10500, type:'main' },
+  maoFlower:     { name:'マオジェル 花びらネイル',      dur:90, price:11000, type:'main' },
+  maoLameFrench: { name:'マオラメフレンチ',            dur:90, price:11000, type:'main' },
+  maoShower:     { name:'マオシャワー',                dur:90, price:12000, type:'main' },
+  maoGrain:      { name:'ひと粒置きネイル',            dur:90, price:10000, type:'main' },
+  maoMilkCafe:   { name:'ミルグラ/カフェグラ',         dur:90, price:11000, type:'main' },
+  maoKirabira:   { name:'キラびらネイル',              dur:90, price:10000, type:'main' },
+  // デザインメニュー
+  glassFrench:   { name:'yorunail風ガラスフレンチ',    dur:90, price:9900,  type:'main' },
+  select2art:    { name:'選べる2本アート',             dur:90, price:8000,  type:'main' },
+  tarashikomi:   { name:'たらしこみフラワー',          dur:90, price:9900,  type:'main' },
+  // オフ（付け替え時）
+  offSelf:       { name:'自店オフ',                   dur:0,  price:0,     type:'off' },
+  offOther:      { name:'他店オフ',                   dur:0,  price:0,     type:'off' },
+  offLong:       { name:'他店オフ（長さ出し・スカルプ）', dur:0,  price:1000,  type:'off' }
+};
+var DOW = ['日','月','火','水','木','金','土'];
+var MAX_DAYS = 60;
+
+// ── 状態 ──
+var uid = null;
+var customer = null;    // { exists, name, phone }
+var sel = {};
+var dur = 0, price = 0, label = '';
+var step = 1;
+var cY, cM;
+var pickedDate = null;
+var pickedTime== null;
+var slotsCache = {};
+var loadedRange = null;
+
+// ── LIFF 初期化 ──
+window.addEventListener('DOMContentLoaded', async function(){
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (!liff.isLoggedIn()) { liff.login(); return; }
+    var profile = await liff.getProfile();
+    uid = profile.userId;
+    await loadCustomer();
+    var now = new Date();
+    cY = now.getFullYear();
+    cM = now.getMonth();
+    drawCal();
+    hideLoading();
+  } catch(e) {
+    console.error('LIFF init error:', e);
+    toast('読み込みに失敗しました。再度お試しください。');
+    hideLoading();
+  }
+});
+
+// ── API ──
+async function apiGet(params){
+  var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
+  var r = await fetch(GAS_URL+'?'+qs);
+  return await r.json();
+}
+async function apiPost(body){
+  var r = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  return await r.json();
+}
+
+// ── 顧客情報 ──
+async function loadCustomer(){
+  try {
+    var res = await apiGet({action:'getCustomer', uid:uid});
+    if(res.success) customer = res.data;
+  } catch(e){ console.error(e); }
+}
+
+// ── メニュー選択 ──
+// メインメニュー: 1つだけ選択（ラジオ式）
+// オフ: メイン選択後に1つだけ選択可能
+function hasMainSelected(){ return Object.keys(sel).some(function(k){ return M[k] && M[k].type==='main'; }); }
+
+window.toggleMenu = function(id){
+  var m = M[id]; if(!m) return;
+  // オフはメイン未選択なら無効
+  if(m.type==='off' && !hasMainSelected()) return;
+
+  if(sel[id]){
+    delete sel[id];
+  } else {
+    if(m.type==='main'){
+      // 他のメインを解除（1つだけ選択）
+      Object.keys(sel).forEach(function(k){ if(M[k] && M[k].type==='main') delete sel[k]; });
+    }
+    if(m.type==='off'){
+      // 他のオフを解除（1つだけ選択）
+      Object.keys(sel).forEach(function(k){ if(M[k] && M[k].type==='off') delete sel[k]; });
+    }
+    sel[id] = true;
+  }
+  // メインが外れたらオフも解除
+  if(!hasMainSelected()){
+    Object.keys(sel).forEach(function(k){ if(M[k] && M[k].type==='off') delete sel[k]; });
+  }
+  refreshMenuUI(); refreshFloat();
+  slotsCache = {}; loadedRange = null;
+  pickedDate = null; pickedTime = null;
+  // メイン選択直後：オフセクションの存在を通知
+  if(m.type==='main' && sel[id]){
+    toast('付け替えオフが必要な場合は下のオフメニューをお選びください');
+    var offCard = document.getElementById('mc-offSelf');
+    if(offCard) setTimeout(function(){ offCard.scrollIntoView({behavior:'smooth',block:'center'}); }, 400);
+  }
+};
+
+function refreshMenuUI(){
+  var hasMain = hasMainSelected();
+  document.querySelectorAll('.menu-card').forEach(function(el){
+    var id=el.getAttribute('data-id'), m=M[id]; if(!m) return;
+    el.classList.toggle('selected', !!sel[id]);
+    if(m.type==='off') el.classList.toggle('disabled', !hasMain);
+  });
+}
+
+function refreshFloat(){
+  dur=0; price=0; var labs=[];
+  Object.keys(sel).forEach(function(id){ dur+=M[id].dur; price+=M[id].price; labs.push(M[id].name); });
+  label = labs.join(' + ');
+  var bar=document.getElementById('floatBar');
+  if(labs.length){
+    bar.classList.add('show');
+    document.getElementById('fbMenu').textContent=label;
+    document.getElementById('fbPrice').textContent='¥'+price.toLocaleString();
+    document.getElementById('fbDur').textContent='約'+dur+'分';
+  } else { bar.classList.remove('show'); }
+  refreshBtn();
+}
+
+// ── ステップ遷移 ──
+window.goStep = function(s){
+  step=s;
+  ['sec1','sec2','sec3','sec4'].forEach(function(id){ document.getElementById(id).classList.remove('visible'); });
+  document.getElementById('sec'+s).classList.add('visible');
+  for(var i=1;i<=3;i++){
+    var si=document.getElementById('si'+i); si.classList.remove('active','done');
+    if(i<s) si.classList.add('done'); if(i===s) si.classList.add('active');
+    if(i<3){ var ln=document.getElementById('sl'+i); ln.classList.remove('active','done'); if(i<s) ln.classList.add('done'); if(i===s) ln.classList.add('active'); }
+  }
+  if(s===2){ drawCal(); loadSlotsIfNeeded(); showCustCard(); }
+  if(s===3) renderConfirm();
+  if(s===4) document.getElementById('floatBar').classList.remove('show');
+  refreshBtn();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+window.onNext = function(e){
+  e.stopPropagation();
+  if(step===1){ if(!Object.keys(sel).length){toast('メニューを選択してください');return;} goStep(2); }
+  else if(step===2){ if(!pickedDate||!pickedTime){toast('日時を選択してください');return;} if(!validateForm())return; goStep(3); }
+  else if(step===3){ submitReservation(); }
+};
+
+function refreshBtn(){
+  var btn=document.getElementById('btnNext');
+  if(step===1){ btn.textContent='日時選択へ'; btn.disabled=!Object.keys(sel).length; }
+  else if(step===2){ btn.textContent='確認画面へ'; btn.disabled=!pickedDate||!pickedTime; }
+  else if(step===3){ btn.textContent='予約を確定する'; btn.disabled=false; }
+}
+
+// ── カレンダー ──
+window.navMonth = function(d){
+  cM+=d; if(cM>11){cM=0;cY++;} if(cM<0){cM=11;cY--;}
+  drawCal(); loadSlotsIfNeeded();
+};
+
+function drawCal(){
+  var now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var maxD=new Date(today); maxD.setDate(maxD.getDate()+MAX_DAYS);
+  document.getElementById('calTitle').textContent=cY+'年'+(cM+1)+'月';
+  var pm=new Date(cY,cM,1); pm.setMonth(pm.getMonth()-1);
+  document.getElementById('calPrev').disabled=(pm<new Date(today.getFullYear(),today.getMonth(),1));
+  document.getElementById('calNext').disabled=(new Date(cY,cM+1,1)>maxD);
+  var g=document.getElementById('calGrid'); g.innerHTML='';
+  DOW.forEach(function(d){ var e=document.createElement('div'); e.className='cal-dow'; e.textContent=d; g.appendChild(e); });
+  var first=new Date(cY,cM,1).getDay(), dim=new Date(cY,cM+1,0).getDate();
+  for(var i=0;i<first;i++){var e=document.createElement('div');e.className='cal-cell empty';g.appendChild(e);}
+  for(var d=1;d<=dim;d++){
+    var dt=new Date(cY,cM,d), ds=fmtD(dt), c=document.createElement('div'); c.className='cal-cell'; c.textContent=d;
+    if(dt.getTime()===today.getTime()) c.classList.add('today');
+    if(dt<today||dt>maxD){ c.classList.add('unavailable'); }
+    else if(slotsCache[ds]!==undefined){
+      if(slotsCache[ds]&&slotsCache[ds].length){ c.classList.add('available'); var dot=document.createElement('div');dot.className='avail-dot';c.appendChild(dot); }
+      else c.classList.add('unavailable');
+    } else { c.classList.add('available'); var dot=document.createElement('div');dot.className='avail-dot';c.appendChild(dot); }
+    if(ds===pickedDate) c.classList.add('selected');
+    (function(s,dt){c.onclick=function(){if(this.classList.contains('unavailable'))return;selectDate(s,dt);};})(ds,dt);
+    g.appendChild(c);
+  }
+}
+
+async function loadSlotsIfNeeded(){
+  if(!dur) return;
+  var now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var start=new Date(cY,cM,1); if(start<today) start=new Date(today);
+  var end=new Date(cY,cM+1,0); var maxD=new Date(today); maxD.setDate(maxD.getDate()+MAX_DAYS);
+  if(end>maxD) end=new Date(maxD);
+  if(loadedRange && start>=loadedRange.start && end<=loadedRange.end) return;
+
+  showLoading('空き状況を確認中...');
+  try{
+    var res=await apiGet({action:'getSlots',startDate:fmtD(start),endDate:fmtD(end),duration:dur});
+    if(res.success){
+      var slots=res.data.slots;
+      Object.keys(slots).forEach(function(k){slotsCache[k]=slots[k];});
+      var d=new Date(start);
+      while(d<=end){ var ds=fmtD(d); if(slotsCache[ds]===undefined) slotsCache[ds]=[]; d.setDate(d.getDate()+1); }
+      if(!loadedRange) loadedRange={start:start,end:end};
+      else{ if(start<loadedRange.start)loadedRange.start=start; if(end>loadedRange.end)loadedRange.end=end; }
+      drawCal();
+    }
+  } catch(e){ console.error(e); toast('空き状況の取得に失敗しました'); }
+  hideLoading();
+}
+
+async function selectDate(ds,dt){
+  pickedDate=ds; pickedTime=null; drawCal();
+  var tc=document.getElementById('timeCard'); tc.style.display='block';
+  document.getElementById('timeTitle').textContent=(dt.getMonth()+1)+'月'+dt.getDate()+'日('+DOW[dt.getDay()]+') の空き時間';
+  if(slotsCache[ds]===undefined){
+    showLoading('空き状況を確認中...');
+    try{ var res=await apiGet({action:'getSlots',startDate:ds,endDate:ds,duration:dur}); if(res.success) slotsCache[ds]=res.data.slots[ds]||[]; } catch(e){console.error(e);}
+    hideLoading();
+  }
+  renderTimeSlots(ds);
+  refreshBtn();
+  tc.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderTimeSlots(ds){
+  var tg=document.getElementById('timeGrid'), ns=document.getElementById('noSlots');
+  tg.innerHTML='';
+  var slots=slotsCache[ds]||[];
+  if(!slots.length){ tg.style.display='none'; ns.style.display='block'; return; }
+  tg.style.display='grid'; ns.style.display='none';
+  slots.forEach(function(t){
+    var ch=document.createElement('div'); ch.className='time-chip'; ch.textContent=t;
+    if(t===pickedTime) ch.classList.add('selected');
+    ch.onclick=function(){
+      pickedTime=t;
+      tg.querySelectorAll('.time-chip.selected').forEach(function(el){el.classList.remove('selected');});
+      ch.classList.add('selected');
+      refreshBtn();
+    };
+    tg.appendChild(ch);
+  });
+}
+
+// ── 顧客フォーム ──
+function showCustCard(){
+  document.getElementById('custCard').style.display=(customer&&customer.exists)?'none':'block';
+}
+function validateForm(){
+  if(customer&&customer.exists) return true;
+  var ok=true, n=document.getElementById('inName'), p=document.getElementById('inPhone');
+  if(!n.value.trim()){n.classList.add('has-error');document.getElementById('errName').style.display='block';ok=false;}
+  else{n.classList.remove('has-error');document.getElementById('errName').style.display='none';}
+  var pc=p.value.replace(/[-\s\u3000]/g,'');
+  if(!/^0\d{9,10}$/.test(pc)){p.classList.add('has-error');document.getElementById('errPhone').style.display='block';ok=false;}
+  else{p.classList.remove('has-error');document.getElementById('errPhone').style.display='none';}
+  return ok;
+}
+function getName(){ return (customer&&customer.exists)?customer.name:document.getElementById('inName').value.trim(); }
+function getPhone(){ return (customer&&customer.exists)?customer.phone:document.getElementById('inPhone').value.trim(); }
+
+// ── 確認画面 ──
+function renderConfirm(){
+  var dt=parseD(pickedDate), dw=DOW[dt.getDay()], p=pickedDate.split('-');
+  var ds=parseInt(p[0])+'年'+parseInt(p[1])+'月'+parseInt(p[2])+'日('+dw+')';
+  var tp=pickedTime.split(':'), em=parseInt(tp[0])*60+parseInt(tp[1])+dur;
+  var eh=('0'+Math.floor(em/60)).slice(-2), emm=('0'+(em%60)).slice(-2);
+  document.getElementById('cfMenu').textContent=label;
+  document.getElementById('cfDate').textContent=ds+' '+pickedTime+'〜'+eh+':'+emm;
+  document.getElementById('cfDur').textContent='約'+dur+'分';
+  document.getElementById('cfName').textContent=getName();
+  document.getElementById('cfPhone').textContent=getPhone();
+  document.getElementById('cfPrice').textContent='¥'+price.toLocaleString()+'（税込）';
+}
+
+// ── 予約送信（本番: GAS API） ──
+async function submitReservation(){
+  showLoading('ご予約を確定しています...');
+  document.getElementById('btnNext').disabled=true;
+  try{
+    var res=await apiPost({
+      action:'createReservation', uid:uid,
+      name:getName(), phone:getPhone(),
+      date:pickedDate, time:pickedTime,
+      menuIds:Object.keys(sel), totalDuration:dur,
+      totalPrice:price, menuLabel:label
+    });
+    if(res.success){
+      var data=res.data;
+      var dt=parseD(data.date), dw=DOW[dt.getDay()], p=data.date.split('-');
+      var ds=parseInt(p[0])+'年'+parseInt(p[1])+'月'+parseInt(p[2])+'日('+dw+')';
+      document.getElementById('doneMenu').textContent=data.menuLabel;
+      document.getElementById('doneDate').textContent=ds+' '+data.time+'〜'+data.endTime;
+      document.getElementById('doneDur').textContent='約'+data.totalDuration+'分';
+      document.getElementById('donePrice').textContent='¥'+data.totalPrice.toLocaleString()+'（税込）';
+      goStep(4);
+    } else {
+      toast(res.error||'予約に失敗しました');
+      document.getElementById('btnNext').disabled=false;
+    }
+  } catch(e){ console.error(e); toast('通信エラーが発生しました'); document.getElementById('btnNext').disabled=false; }
+  hideLoading();
+}
+
+// ── ボトムシート ──
+window.openSheet = function(){
+  if(!Object.keys(sel).length)return;
+  var c=document.getElementById('sheetItems'); c.innerHTML='';
+  Object.keys(sel).forEach(function(id){
+    var m=M[id], d=document.createElement('div'); d.className='sheet-item';
+    d.innerHTML='<div class="sheet-item-info"><div class="item-name">'+m.name+'</div><div class="item-meta">'+m.dur+'分 / ¥'+m.price.toLocaleString()+'</div></div><button class="btn-remove" data-rm="'+id+'">✕</button>';
+    c.appendChild(d);
+  });
+  c.querySelectorAll('.btn-remove').forEach(function(b){
+    b.onclick=function(e){e.stopPropagation();toggleMenu(this.getAttribute('data-rm'));if(!Object.keys(sel).length)closeSheet();else openSheet();};
+  });
+  document.getElementById('sheetBg').classList.add('open');
+  setTimeout(function(){document.getElementById('sheetPanel').classList.add('open');},10);
+};
+window.closeSheet = function(){
+  document.getElementById('sheetPanel').classList.remove('open');
+  setTimeout(function(){document.getElementById('sheetBg').classList.remove('open');},350);
+};
+
+// ── LIFF閉じる ──
+window.closeLiff = function(){
+  if(liff.isInClient()) liff.closeWindow(); else window.close();
+};
+
+// ── ユーティリティ ──
+function fmtD(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function parseD(s){ var p=s.split('-'); return new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])); }
+function showLoading(msg){ var el=document.getElementById('loading');el.querySelector('.loading-msg').textContent=msg||'読み込み中...';el.classList.add('show'); }
+function hideLoading(){ document.getElementById('loading').classList.remove('show'); }
+function toast(msg){ var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500); }
+
+})();
+</script>
+
+</body>
+</html>
