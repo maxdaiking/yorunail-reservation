@@ -1639,8 +1639,9 @@ window.toggleMenu = function(id){
   refreshMenuUI(); refreshFloat();
   slotsCache = {}; loadedRange = null;
   pickedDate = null; pickedTime = null;
-  // メイン選択直後：オフセクションの存在を通知
+  // メイン選択直後：他のアコーディオンを閉じてオフセクションを案内
   if(m.type==='main' && sel[id]){
+    document.querySelectorAll('.accordion-header').forEach(function(h){ h.setAttribute('aria-expanded','false'); });
     toast('付け替えオフが必要な場合は下のオフメニューをお選びください');
     var offCard = document.getElementById('mc-offSelf');
     if(offCard) setTimeout(function(){ offCard.scrollIntoView({behavior:'smooth',block:'center'}); }, 400);
@@ -1822,10 +1823,16 @@ function renderTimeSlots(ds){
 
 // ── 顧客フォーム ──
 function showCustCard(){
-  document.getElementById('custCard').style.display=(customer&&customer.exists)?'none':'block';
+  // 常にフォームを表示（リピーターの場合はプリフィル）
+  document.getElementById('custCard').style.display='block';
+  if(customer&&customer.exists){
+    var n=document.getElementById('inName'), p=document.getElementById('inPhone'), e=document.getElementById('inEmail');
+    if(customer.name) n.value=customer.name;
+    if(customer.phone) p.value=customer.phone;
+    if(customer.email) e.value=customer.email;
+  }
 }
 function validateForm(){
-  if(customer&&customer.exists) return true;
   var ok=true, n=document.getElementById('inName'), p=document.getElementById('inPhone'), e=document.getElementById('inEmail');
   if(!n.value.trim()){n.classList.add('has-error');document.getElementById('errName').style.display='block';ok=false;}
   else{n.classList.remove('has-error');document.getElementById('errName').style.display='none';}
@@ -1837,9 +1844,9 @@ function validateForm(){
   else{e.classList.remove('has-error');document.getElementById('errEmail').style.display='none';}
   return ok;
 }
-function getName(){ return (customer&&customer.exists)?customer.name:document.getElementById('inName').value.trim(); }
-function getPhone(){ return (customer&&customer.exists)?customer.phone:document.getElementById('inPhone').value.trim(); }
-function getEmail(){ return (customer&&customer.exists)?(customer.email||''):document.getElementById('inEmail').value.trim(); }
+function getName(){ return document.getElementById('inName').value.trim(); }
+function getPhone(){ return document.getElementById('inPhone').value.trim(); }
+function getEmail(){ return document.getElementById('inEmail').value.trim(); }
 
 // ── 確認画面 ──
 function renderConfirm(){
