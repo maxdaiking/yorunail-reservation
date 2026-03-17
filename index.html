@@ -794,25 +794,7 @@ body {
   font-weight: 500;
 }
 
-/* ── トースト ── */
-.toast {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  background: var(--error);
-  color: #fff;
-  padding: 14px 18px;
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-  z-index: 600;
-  transform: translateY(-120%);
-  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
-  box-shadow: var(--shadow-lg);
-}
-.toast.show { transform: translateY(0); }
+/* (toast: CSS削除済み — JSでインラインスタイル生成) */
 
 /* ── デモバナー ── */
 .demo-badge {
@@ -1696,7 +1678,7 @@ body { padding-top: 28px; }
   }
 }
 
-/* (toast: 重複定義削除済み — 797行目の定義を使用) */
+/* (toast: CSS削除済み — JSでインラインスタイル生成) */
 
 /* スケルトンローディング */
 .skeleton {
@@ -1808,8 +1790,7 @@ button, .menu-card, .day, .time-slot, .accordion-header {
   <div class="loading-msg">読み込み中...</div>
 </div>
 
-<!-- トースト -->
-<div id="toast" class="toast"></div>
+<!-- トースト: JSで動的生成 -->
 
 <!-- ヘッダー -->
 <div class="header">
@@ -2624,7 +2605,16 @@ function fmtD(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-
 function parseD(s){ var p=s.split('-'); return new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])); }
 function showLoading(msg){ var el=document.getElementById('loading');el.querySelector('.loading-msg').textContent=msg||'読み込み中...';el.classList.add('show'); }
 function hideLoading(){ document.getElementById('loading').classList.remove('show'); }
-function toast(msg){ var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500); }
+function toast(msg){
+  var old=document.getElementById('yn-toast-live');
+  if(old) old.remove();
+  var t=document.createElement('div');
+  t.id='yn-toast-live';
+  t.textContent=msg;
+  t.style.cssText='position:fixed;top:16px;left:16px;right:16px;bottom:auto;height:auto;max-height:100px;background:#d45858;color:#fff;padding:14px 18px;border-radius:14px;font-size:0.85rem;font-weight:600;text-align:center;z-index:9999;box-shadow:0 8px 32px rgba(50,30,30,0.12);transition:opacity 0.3s;opacity:1;';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); },400); },3000);
+}
 
 // ── アコーディオン ──
 window.toggleAccordion = function(el){
