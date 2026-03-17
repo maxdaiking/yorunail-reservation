@@ -894,10 +894,9 @@ body {
 
 .accordion-content {
   overflow: hidden;
-  transition: max-height 0.4s ease-out;
 }
 .accordion-content.closed {
-  max-height: 0 !important;
+  display: none;
 }
 
 
@@ -1945,46 +1944,26 @@ window.toggleAccordion = function(el){
   var expanded = el.getAttribute('aria-expanded') === 'true';
   var content = el.nextElementSibling;
   if(expanded){
-    // 閉じる
     el.setAttribute('aria-expanded','false');
-    content.style.maxHeight = content.scrollHeight + 'px';
-    // 次フレームで0に遷移
-    requestAnimationFrame(function(){
-      content.style.maxHeight = '0px';
-    });
     content.classList.add('closed');
   } else {
-    // 開く
     el.setAttribute('aria-expanded','true');
     content.classList.remove('closed');
-    content.style.maxHeight = content.scrollHeight + 'px';
-    // 遷移完了後にmax-heightを解除
-    content.addEventListener('transitionend', function handler(){
-      content.style.maxHeight = '';
-      content.removeEventListener('transitionend', handler);
-    });
   }
 };
 
-// 閉じるヘルパー（toggleMenuやgoStepから呼ぶ用）
 window.closeAllAccordions = function(){
   document.querySelectorAll('.accordion-header').forEach(function(h){
-    if(h.getAttribute('aria-expanded') === 'true'){
-      var content = h.nextElementSibling;
-      h.setAttribute('aria-expanded','false');
-      content.style.maxHeight = content.scrollHeight + 'px';
-      requestAnimationFrame(function(){
-        content.style.maxHeight = '0px';
-      });
-      content.classList.add('closed');
-    }
+    h.setAttribute('aria-expanded','false');
+    var content = h.nextElementSibling;
+    if(content) content.classList.add('closed');
   });
 };
 
 </script>
 
 <!-- バージョン確認用（デバッグ） -->
-<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v2.1-20260317</div>
+<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v2.2-20260317</div>
 
 </body>
 </html>
