@@ -1597,7 +1597,7 @@ async function apiGet(params){
   return await r.json();
 }
 async function apiPost(body){
-  var r = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  var r = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(body) });
   return await r.json();
 }
 
