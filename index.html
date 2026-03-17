@@ -1633,9 +1633,11 @@ window.toggleMenu = function(id){
   refreshMenuUI(); refreshFloat();
   slotsCache = {}; loadedRange = null;
   pickedDate = null; pickedTime = null;
-  // メイン選択直後：他のアコーディオンを閉じてオフセクションを案内
+  // メイン選択直後：選択したメニューのアコーディオンは開いたまま、他を閉じてオフセクションを案内
   if(m.type==='main' && sel[id]){
-    closeAllAccordions();
+    var clickedCard = document.querySelector('[data-id="'+id+'"]');
+    var keepOpen = clickedCard ? clickedCard.closest('.card') : null;
+    closeOtherAccordions(keepOpen);
     toast('付け替えオフが必要な場合は下のオフメニューをお選びください');
     var offCard = document.getElementById('mc-offSelf');
     if(offCard) setTimeout(function(){ offCard.scrollIntoView({behavior:'smooth',block:'center'}); }, 400);
@@ -1954,6 +1956,17 @@ window.toggleAccordion = function(el){
 
 window.closeAllAccordions = function(){
   document.querySelectorAll('.accordion-header').forEach(function(h){
+    h.setAttribute('aria-expanded','false');
+    var content = h.nextElementSibling;
+    if(content) content.classList.add('closed');
+  });
+};
+
+// 指定したカードコンテナ以外のアコーディオンを閉じる
+window.closeOtherAccordions = function(keepOpenCard){
+  document.querySelectorAll('.accordion-header').forEach(function(h){
+    var parentCard = h.closest('.card');
+    if(parentCard === keepOpenCard) return; // この親は開いたまま
     h.setAttribute('aria-expanded','false');
     var content = h.nextElementSibling;
     if(content) content.classList.add('closed');
