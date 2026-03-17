@@ -1369,6 +1369,11 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
           <input class="form-input" type="tel" id="inPhone" placeholder="090-1234-5678" autocomplete="tel">
           <div class="form-error-msg" id="errPhone">正しい電話番号を入力してください</div>
         </div>
+        <div class="form-group">
+          <label class="form-label">メールアドレス<span class="form-required">必須</span></label>
+          <input class="form-input" type="email" id="inEmail" placeholder="example@email.com" autocomplete="email">
+          <div class="form-error-msg" id="errEmail">正しいメールアドレスを入力してください</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1389,6 +1394,7 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
           <li class="confirm-row"><span class="confirm-label">所要時間</span><span class="confirm-value" id="cfDur"></span></li>
           <li class="confirm-row"><span class="confirm-label">お名前</span><span class="confirm-value" id="cfName"></span></li>
           <li class="confirm-row"><span class="confirm-label">電話番号</span><span class="confirm-value" id="cfPhone"></span></li>
+          <li class="confirm-row"><span class="confirm-label">メール</span><span class="confirm-value" id="cfEmail"></span></li>
           <li class="confirm-row"><span class="confirm-label">合計金額</span><span class="confirm-value highlight" id="cfPrice"></span></li>
         </ul>
       </div>
@@ -1781,16 +1787,20 @@ function showCustCard(){
 }
 function validateForm(){
   if(customer&&customer.exists) return true;
-  var ok=true, n=document.getElementById('inName'), p=document.getElementById('inPhone');
+  var ok=true, n=document.getElementById('inName'), p=document.getElementById('inPhone'), e=document.getElementById('inEmail');
   if(!n.value.trim()){n.classList.add('has-error');document.getElementById('errName').style.display='block';ok=false;}
   else{n.classList.remove('has-error');document.getElementById('errName').style.display='none';}
   var pc=p.value.replace(/[-\s\u3000]/g,'');
   if(!/^0\d{9,10}$/.test(pc)){p.classList.add('has-error');document.getElementById('errPhone').style.display='block';ok=false;}
   else{p.classList.remove('has-error');document.getElementById('errPhone').style.display='none';}
+  var ev=e.value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev)){e.classList.add('has-error');document.getElementById('errEmail').style.display='block';ok=false;}
+  else{e.classList.remove('has-error');document.getElementById('errEmail').style.display='none';}
   return ok;
 }
 function getName(){ return (customer&&customer.exists)?customer.name:document.getElementById('inName').value.trim(); }
 function getPhone(){ return (customer&&customer.exists)?customer.phone:document.getElementById('inPhone').value.trim(); }
+function getEmail(){ return (customer&&customer.exists)?(customer.email||''):document.getElementById('inEmail').value.trim(); }
 
 // ── 確認画面 ──
 function renderConfirm(){
@@ -1803,6 +1813,7 @@ function renderConfirm(){
   document.getElementById('cfDur').textContent='約'+dur+'分';
   document.getElementById('cfName').textContent=getName();
   document.getElementById('cfPhone').textContent=getPhone();
+  document.getElementById('cfEmail').textContent=getEmail();
   document.getElementById('cfPrice').textContent='¥'+price.toLocaleString()+'（税込）';
 }
 
@@ -1814,7 +1825,7 @@ async function submitReservation(){
   try{
     var res=await apiPost({
       action:'createReservation', uid:uid,
-      name:getName(), phone:getPhone(),
+      name:getName(), phone:getPhone(), email:getEmail(),
       date:pickedDate, time:pickedTime,
       menuIds:Object.keys(sel), totalDuration:dur,
       totalPrice:price, menuLabel:label
