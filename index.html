@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ネイル予約 | YoruNail</title>
@@ -890,19 +893,11 @@ body {
 }
 
 .accordion-content {
-  display: grid;
-  grid-template-rows: 0fr;
   overflow: hidden;
-  transition: grid-template-rows 0.3s ease;
+  transition: max-height 0.4s ease-out;
 }
-
-.accordion-header[aria-expanded="true"] ~ .accordion-content {
-  grid-template-rows: 1fr;
-}
-
-.accordion-content > * {
-  overflow: hidden;
-  min-height: 0;
+.accordion-content.closed {
+  max-height: 0 !important;
 }
 
 
@@ -1169,7 +1164,7 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
         <div class="accordion-badge">7</div>
         <div class="accordion-arrow">▼</div>
       </button>
-      <div class="accordion-content">
+      <div class="accordion-content closed">
       <div class="card-body">
         <div class="menu-list">
           <div class="menu-card" data-id="maoSet" onclick="toggleMenu('maoSet')">
@@ -1264,7 +1259,7 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
         <div class="accordion-badge">3</div>
         <div class="accordion-arrow">▼</div>
       </button>
-      <div class="accordion-content">
+      <div class="accordion-content closed">
       <div class="card-body">
         <div class="menu-list">
           <div class="menu-card" data-id="glassFrench" onclick="toggleMenu('glassFrench')">
@@ -1641,7 +1636,7 @@ window.toggleMenu = function(id){
   pickedDate = null; pickedTime = null;
   // メイン選択直後：他のアコーディオンを閉じてオフセクションを案内
   if(m.type==='main' && sel[id]){
-    document.querySelectorAll('.accordion-header').forEach(function(h){ h.setAttribute('aria-expanded','false'); });
+    closeAllAccordions();
     toast('付け替えオフが必要な場合は下のオフメニューをお選びください');
     var offCard = document.getElementById('mc-offSelf');
     if(offCard) setTimeout(function(){ offCard.scrollIntoView({behavior:'smooth',block:'center'}); }, 400);
@@ -1683,7 +1678,7 @@ window.goStep = function(s){
   }
   if(s===2){
     // アコーディオンを全て閉じる
-    document.querySelectorAll('.accordion-header').forEach(function(h){ h.setAttribute('aria-expanded','false'); });
+    closeAllAccordions();
     drawCal(); loadSlotsIfNeeded(); showCustCard();
   }
   if(s===3) renderConfirm();
@@ -1948,10 +1943,48 @@ function toast(msg){
 // ── アコーディオン ──
 window.toggleAccordion = function(el){
   var expanded = el.getAttribute('aria-expanded') === 'true';
-  el.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  var content = el.nextElementSibling;
+  if(expanded){
+    // 閉じる
+    el.setAttribute('aria-expanded','false');
+    content.style.maxHeight = content.scrollHeight + 'px';
+    // 次フレームで0に遷移
+    requestAnimationFrame(function(){
+      content.style.maxHeight = '0px';
+    });
+    content.classList.add('closed');
+  } else {
+    // 開く
+    el.setAttribute('aria-expanded','true');
+    content.classList.remove('closed');
+    content.style.maxHeight = content.scrollHeight + 'px';
+    // 遷移完了後にmax-heightを解除
+    content.addEventListener('transitionend', function handler(){
+      content.style.maxHeight = '';
+      content.removeEventListener('transitionend', handler);
+    });
+  }
+};
+
+// 閉じるヘルパー（toggleMenuやgoStepから呼ぶ用）
+window.closeAllAccordions = function(){
+  document.querySelectorAll('.accordion-header').forEach(function(h){
+    if(h.getAttribute('aria-expanded') === 'true'){
+      var content = h.nextElementSibling;
+      h.setAttribute('aria-expanded','false');
+      content.style.maxHeight = content.scrollHeight + 'px';
+      requestAnimationFrame(function(){
+        content.style.maxHeight = '0px';
+      });
+      content.classList.add('closed');
+    }
+  });
 };
 
 </script>
+
+<!-- バージョン確認用（デバッグ） -->
+<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v2.1-20260317</div>
 
 </body>
 </html>
