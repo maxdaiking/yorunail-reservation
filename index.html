@@ -1444,7 +1444,7 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
     <div class="completion-status">
       <div class="completion-icon">✨</div>
       <div class="completion-message">ご予約ありがとうございます</div>
-      <div class="completion-detail">LINEに確認通知をお送りしました</div>
+      <div class="completion-detail">LINEとメールに確認通知をお送りしました</div>
     </div>
     
     <!-- 予約サマリー -->
@@ -1680,7 +1680,11 @@ window.goStep = function(s){
     if(i<s) si.classList.add('done'); if(i===s) si.classList.add('active');
     if(i<3){ var ln=document.getElementById('sl'+i); ln.classList.remove('active','done'); if(i<s) ln.classList.add('done'); if(i===s) ln.classList.add('active'); }
   }
-  if(s===2){ drawCal(); loadSlotsIfNeeded(); showCustCard(); }
+  if(s===2){
+    // アコーディオンを全て閉じる
+    document.querySelectorAll('.accordion-header').forEach(function(h){ h.setAttribute('aria-expanded','false'); });
+    drawCal(); loadSlotsIfNeeded(); showCustCard();
+  }
   if(s===3) renderConfirm();
   if(s===4) document.getElementById('floatBar').classList.remove('show');
   refreshBtn();
