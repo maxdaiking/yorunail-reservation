@@ -2222,7 +2222,7 @@ button, .menu-card, .day, .time-slot, .accordion-header {
     <div class="completion-status">
       <div class="completion-icon">✨</div>
       <div class="completion-message">ご予約ありがとうございます</div>
-      <div class="completion-detail">確認メールをお送りしました</div>
+      <div class="completion-detail">LINEに確認通知をお送りしました</div>
     </div>
     
     <!-- 予約サマリー -->
@@ -2236,6 +2236,11 @@ button, .menu-card, .day, .time-slot, .accordion-header {
       <div class="summary-card-value" id="summaryMenu">メニュー</div>
     </div>
     
+    <div class="summary-card">
+      <div class="summary-card-title">⏱ 所要時間</div>
+      <div class="summary-card-value" id="summaryDur">-</div>
+    </div>
+
     <div class="summary-card">
       <div class="summary-card-title">💰 予約金額</div>
       <div class="summary-card-value" id="summaryPrice">¥0</div>
@@ -2266,7 +2271,7 @@ button, .menu-card, .day, .time-slot, .accordion-header {
       <button class="btn-primary" onclick="goStep(1)" style="background: white; color: var(--primary); border: 1.5px solid var(--primary); flex: 1;">
         新しい予約を作成
       </button>
-      <button class="btn-primary" style="flex: 1;" onclick="window.location.href='/'">
+      <button class="btn-primary" style="flex: 1;" onclick="closeLiff()">
         ホームに戻る
       </button>
     </div>
@@ -2275,16 +2280,13 @@ button, .menu-card, .day, .time-slot, .accordion-header {
 </div>
 
 <!-- フローティングバー -->
-<div class="floating-bar">
-  <div class="floating-menu-info">
-    <div class="floating-menu-label">選択メニュー</div>
-    <div class="floating-menu-name">メニューを選択</div>
-  </div>
-  <div class="floating-buttons">
-    <button class="btn-next" onclick="goStep(step + 1)">次へ</button>
-  </div>
-  <div class="floating-progress"></div>
-</div>
+<div class="float-bar" id="floatBar">
+  <div class="float-row">
+    <div class="float-info" onclick="openSheet()">
+      <div class="float-menu" id="fbMenu"></div>
+      <div class="float-price" id="fbPrice"></div>
+      <div class="float-duration" id="fbDur"></div>
+    </div>
     <button class="btn-main" id="btnNext" disabled onclick="onNext(event)">次へ</button>
   </div>
 </div>
@@ -2497,7 +2499,7 @@ function drawCal(){
   for(var d=1;d<=dim;d++){
     var dt=new Date(cY,cM,d), ds=fmtD(dt), c=document.createElement('div'); c.className='cal-cell'; c.textContent=d;
     if(dt.getTime()===today.getTime()) c.classList.add('today');
-    if(dt<today||dt>maxD){ c.classList.add('unavailable'); }
+    if(dt<today||dt>maxD||dt.getDay()===6){ c.classList.add('unavailable'); }
     else if(slotsCache[ds]!==undefined){
       if(slotsCache[ds]&&slotsCache[ds].length){ c.classList.add('available'); var dot=document.createElement('div');dot.className='avail-dot';c.appendChild(dot); }
       else c.classList.add('unavailable');
@@ -2612,10 +2614,10 @@ async function submitReservation(){
       var data=res.data;
       var dt=parseD(data.date), dw=DOW[dt.getDay()], p=data.date.split('-');
       var ds=parseInt(p[0])+'年'+parseInt(p[1])+'月'+parseInt(p[2])+'日('+dw+')';
-      document.getElementById('doneMenu').textContent=data.menuLabel;
-      document.getElementById('doneDate').textContent=ds+' '+data.time+'〜'+data.endTime;
-      document.getElementById('doneDur').textContent='約'+data.totalDuration+'分';
-      document.getElementById('donePrice').textContent='¥'+data.totalPrice.toLocaleString()+'（税込）';
+      document.getElementById('summaryMenu').textContent=data.menuLabel;
+      document.getElementById('summaryDate').textContent=ds+' '+data.time+'〜'+data.endTime;
+      document.getElementById('summaryDur').textContent='約'+data.totalDuration+'分';
+      document.getElementById('summaryPrice').textContent='¥'+data.totalPrice.toLocaleString()+'（税込）';
       goStep(4);
     } else {
       toast(res.error||'予約に失敗しました');
@@ -2657,7 +2659,12 @@ function showLoading(msg){ var el=document.getElementById('loading');el.querySel
 function hideLoading(){ document.getElementById('loading').classList.remove('show'); }
 function toast(msg){ var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500); }
 
-})();
+// ── アコーディオン ──
+window.toggleAccordion = function(el){
+  var expanded = el.getAttribute('aria-expanded') === 'true';
+  el.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+};
+
 </script>
 
 </body>
