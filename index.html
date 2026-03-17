@@ -62,11 +62,38 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* ── ドラッグハンドル（LIFF ちょい見せ用） ── */
+.drag-handle-area {
+  background: linear-gradient(145deg, #d48a9a 0%, #b06578 50%, #9a5268 100%);
+  padding: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.drag-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.45);
+}
+.drag-handle-hint {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.7);
+  margin-top: 6px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  animation: pulse-hint 2s ease-in-out infinite;
+}
+@keyframes pulse-hint {
+  0%, 100% { opacity: 0.7; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-2px); }
+}
+
 /* ── ヘッダー ── */
 .header {
   background: linear-gradient(145deg, #d48a9a 0%, #b06578 50%, #9a5268 100%);
   color: #fff;
-  padding: 16px 20px 12px;
+  padding: 10px 20px 12px;
   position: relative;
   overflow: hidden;
 }
@@ -1025,7 +1052,11 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
 
 <!-- トースト: JSで動的生成 -->
 
-<!-- ヘッダー -->
+<!-- ドラッグハンドル + ヘッダー -->
+<div class="drag-handle-area">
+  <div class="drag-handle"></div>
+  <div class="drag-handle-hint">上にスワイプして予約</div>
+</div>
 <div class="header">
   <div class="header-content">
     <div style="flex-grow: 1;">
