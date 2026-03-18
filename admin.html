@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>メニュー管理 | YoruNail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #c97b8b;
+  --primary-dark: #a8596d;
+  --primary-light: #f8e8ed;
+  --primary-pale: #fdf5f7;
+  --bg: #faf7f5;
+  --bg-card: #ffffff;
+  --text: #2d2424;
+  --text-secondary: #6b5a5a;
+  --text-muted: #a89898;
+  --border: #ebe0db;
+  --border-light: #f2ece8;
+  --success: #4ea882;
+  --success-light: #eaf7f0;
+  --error: #d45858;
+  --error-light: #fdeaea;
+  --warning: #d4a04e;
+  --shadow-sm: 0 1px 4px rgba(50,30,30,0.06);
+  --shadow-md: 0 4px 16px rgba(50,30,30,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { font-size:16px; }
+body {
+  font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.7;
+  -webkit-text-size-adjust:100%; padding-bottom:40px;
+}
+
+/* Header */
+.header {
+  background:linear-gradient(145deg,#d48a9a 0%,#b06578 50%,#9a5268 100%);
+  color:#fff; padding:16px 20px; text-align:center;
+}
+.header h1 { font-size:1.1rem; font-weight:700; }
+.header .sub { font-size:0.75rem; opacity:0.8; margin-top:2px; }
+
+/* Login */
+.login-wrap {
+  max-width:400px; margin:60px auto; padding:0 20px;
+}
+.login-card {
+  background:var(--bg-card); border-radius:16px; padding:32px 24px;
+  box-shadow:var(--shadow-md); text-align:center;
+}
+.login-card h2 { font-size:1rem; margin-bottom:20px; color:var(--primary-dark); }
+.login-card .icon { font-size:48px; margin-bottom:16px; }
+.input-field {
+  width:100%; padding:14px 16px; border:2px solid var(--border);
+  border-radius:10px; font-size:1rem; font-family:inherit;
+  outline:none; transition:border-color 0.2s; background:#fff;
+}
+.input-field:focus { border-color:var(--primary); }
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:14px 24px; border:none; border-radius:12px;
+  font-size:0.95rem; font-weight:700; font-family:inherit;
+  cursor:pointer; transition:all 0.2s; width:100%;
+}
+.btn:active { transform:scale(0.97); }
+.btn-primary {
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff; box-shadow:0 4px 12px rgba(168,89,109,0.3);
+}
+.btn-success {
+  background:linear-gradient(135deg,var(--success),#3d9070);
+  color:#fff;
+}
+.btn-outline {
+  background:#fff; color:var(--primary-dark);
+  border:2px solid var(--primary);
+}
+.btn-danger {
+  background:var(--error); color:#fff;
+}
+.btn-sm { padding:10px 16px; font-size:0.85rem; }
+.error-msg { color:var(--error); font-size:0.85rem; margin-top:8px; }
+
+/* Container */
+.container { max-width:480px; margin:0 auto; padding:12px 16px; }
+
+/* Menu list */
+.menu-item {
+  background:var(--bg-card); border-radius:14px; padding:12px;
+  margin-bottom:12px; box-shadow:var(--shadow-sm);
+  border:1px solid var(--border-light);
+  display:flex; align-items:center; gap:12px;
+  cursor:pointer; transition:all 0.2s;
+}
+.menu-item:active { transform:scale(0.98); background:var(--primary-pale); }
+.menu-item.disabled { opacity:0.5; }
+.menu-thumb {
+  width:64px; height:64px; border-radius:10px;
+  object-fit:cover; background:var(--border-light);
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:24px; color:var(--text-muted); overflow:hidden;
+}
+.menu-thumb img { width:100%; height:100%; object-fit:cover; }
+.menu-info { flex:1; min-width:0; }
+.menu-name { font-size:0.9rem; font-weight:700; }
+.menu-meta { font-size:0.78rem; color:var(--text-secondary); margin-top:2px; }
+.menu-badge {
+  display:inline-block; padding:2px 8px; border-radius:20px;
+  font-size:0.65rem; font-weight:700; margin-top:4px;
+}
+.badge-on { background:var(--success-light); color:var(--success); }
+.badge-off { background:var(--error-light); color:var(--error); }
+.badge-popular { background:var(--primary-light); color:var(--primary-dark); }
+.menu-arrow { color:var(--text-muted); font-size:1.2rem; flex-shrink:0; }
+
+/* Category header */
+.cat-header {
+  font-size:0.85rem; font-weight:700; color:var(--primary-dark);
+  padding:12px 4px 6px; display:flex; align-items:center; gap:8px;
+}
+.cat-header .cat-icon {
+  width:28px; height:28px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px;
+}
+.cat-icon.pink { background:var(--primary-light); }
+.cat-icon.amber { background:#fef3e2; }
+.cat-icon.blue { background:#e8f0fd; }
+.cat-icon.green { background:var(--success-light); }
+
+/* Edit form */
+.edit-panel {
+  position:fixed; inset:0; z-index:200;
+  background:var(--bg); overflow-y:auto;
+  transform:translateX(100%); transition:transform 0.3s ease;
+}
+.edit-panel.open { transform:translateX(0); }
+.edit-header {
+  background:var(--bg-card); padding:14px 16px;
+  border-bottom:1px solid var(--border-light);
+  display:flex; align-items:center; gap:12px;
+  position:sticky; top:0; z-index:10;
+}
+.edit-header h2 { font-size:1rem; font-weight:700; flex:1; }
+.edit-body { padding:16px; max-width:480px; margin:0 auto; }
+.form-group { margin-bottom:18px; }
+.form-label {
+  display:block; font-size:0.85rem; font-weight:700;
+  margin-bottom:6px; color:var(--text-secondary);
+}
+.form-hint { font-size:0.75rem; color:var(--text-muted); margin-top:4px; }
+
+/* Photo upload */
+.photo-upload-area {
+  width:100%; aspect-ratio:4/3; border:2px dashed var(--border);
+  border-radius:14px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  cursor:pointer; transition:all 0.2s; overflow:hidden;
+  position:relative; background:var(--bg-card);
+}
+.photo-upload-area:active { border-color:var(--primary); background:var(--primary-pale); }
+.photo-upload-area img {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+}
+.photo-upload-area .overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,0.4);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:#fff; gap:4px; opacity:0; transition:opacity 0.2s;
+}
+.photo-upload-area:active .overlay { opacity:1; }
+.photo-upload-area .placeholder { color:var(--text-muted); text-align:center; }
+.photo-upload-area .placeholder .icon { font-size:36px; }
+.photo-upload-area .placeholder .text { font-size:0.85rem; font-weight:600; }
+
+/* Toggle switch */
+.toggle-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0;
+}
+.toggle-label { font-size:0.9rem; font-weight:600; }
+.toggle-switch {
+  width:52px; height:30px; border-radius:15px;
+  background:var(--border); position:relative;
+  cursor:pointer; transition:background 0.2s;
+}
+.toggle-switch.on { background:var(--success); }
+.toggle-switch::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:24px; height:24px; border-radius:50%;
+  background:#fff; transition:transform 0.2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.15);
+}
+.toggle-switch.on::after { transform:translateX(22px); }
+
+/* Select */
+.select-field {
+  width:100%; padding:14px 16px; border:2px solid var(--border);
+  border-radius:10px; font-size:1rem; font-family:inherit;
+  outline:none; background:#fff; color:var(--text);
+  -webkit-appearance:none; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a89898' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 16px center;
+}
+
+/* Floating action */
+.fab {
+  position:fixed; bottom:24px; right:20px;
+  width:56px; height:56px; border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff; border:none; font-size:24px; font-weight:700;
+  box-shadow:0 4px 16px rgba(168,89,109,0.4);
+  cursor:pointer; z-index:100; display:flex;
+  align-items:center; justify-content:center;
+  transition:all 0.2s;
+}
+.fab:active { transform:scale(0.9); }
+
+/* Toast */
+.toast {
+  position:fixed; top:16px; left:16px; right:16px;
+  padding:14px 18px; border-radius:14px;
+  font-size:0.85rem; font-weight:600; text-align:center;
+  z-index:9999; transition:opacity 0.3s; opacity:1;
+  box-shadow:var(--shadow-md);
+}
+.toast-success { background:var(--success); color:#fff; }
+.toast-error { background:var(--error); color:#fff; }
+
+/* Loading */
+.loading-overlay {
+  position:fixed; inset:0; background:rgba(250,247,245,0.92);
+  z-index:500; display:none; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+}
+.loading-overlay.show { display:flex; }
+.spinner {
+  width:36px; height:36px; border:3px solid var(--border);
+  border-top-color:var(--primary); border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* Action bar */
+.action-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--bg-card); padding:12px 16px 24px;
+  border-top:1px solid var(--border-light);
+  box-shadow:0 -4px 16px rgba(50,30,30,0.08);
+  z-index:50; display:flex; gap:10px;
+  max-width:480px; margin:0 auto;
+}
+
+/* Delete confirm */
+.delete-confirm {
+  background:var(--error-light); border:2px solid var(--error);
+  border-radius:12px; padding:16px; margin-top:16px; text-align:center;
+}
+.delete-confirm p { font-size:0.9rem; margin-bottom:12px; color:var(--error); font-weight:600; }
+.delete-confirm .btns { display:flex; gap:8px; }
+
+/* Logout */
+.logout-bar {
+  text-align:center; padding:24px 16px;
+}
+.logout-btn {
+  background:none; border:1px solid var(--border);
+  padding:8px 20px; border-radius:8px;
+  font-size:0.8rem; color:var(--text-muted);
+  font-family:inherit; cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading" class="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-size:0.88rem;color:var(--text-secondary);">読み込み中...</div>
+</div>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+  <div class="header">
+    <h1>YoruNail 管理画面</h1>
+    <div class="sub">メニュー管理システム</div>
+  </div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="icon">🔐</div>
+      <h2>スタッフログイン</h2>
+      <div class="form-group">
+        <input class="input-field" type="password" id="loginPass" placeholder="パスワードを入力" autocomplete="current-password">
+      </div>
+      <div id="loginError" class="error-msg" style="display:none"></div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="doLogin()">ログイン</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Screen -->
+<div id="mainScreen" style="display:none">
+  <div class="header">
+    <h1>メニュー管理</h1>
+    <div class="sub">メニューの写真・名前・料金を変更できます</div>
+  </div>
+
+  <div class="container" id="menuListContainer">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="logout-bar">
+    <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    <div style="margin-top:8px;font-size:10px;color:#ccc;">YoruNail Admin v1.0</div>
+  </div>
+
+  <!-- FAB: Add new menu -->
+  <button class="fab" onclick="openNewMenu()" title="新しいメニューを追加">＋</button>
+</div>
+
+<!-- Edit Panel (slides in from right) -->
+<div id="editPanel" class="edit-panel">
+  <div class="edit-header">
+    <button class="btn btn-outline btn-sm" onclick="closeEdit()" style="width:auto;padding:8px 14px;">✕ 戻る</button>
+    <h2 id="editTitle">メニュー編集</h2>
+  </div>
+  <div class="edit-body" style="padding-bottom:100px;">
+
+    <!-- Photo -->
+    <div class="form-group">
+      <label class="form-label">写真</label>
+      <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+        <div class="placeholder" id="photoPlaceholder">
+          <div class="icon">📷</div>
+          <div class="text">タップして写真を選択</div>
+        </div>
+        <img id="photoPreview" style="display:none">
+        <div class="overlay">
+          <div style="font-size:24px;">📷</div>
+          <div style="font-size:0.85rem;font-weight:600;">写真を変更</div>
+        </div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+      <div class="form-hint">推奨: 正方形〜横長の写真（4:3）</div>
+    </div>
+
+    <!-- Name -->
+    <div class="form-group">
+      <label class="form-label">メニュー名</label>
+      <input class="input-field" type="text" id="editName" placeholder="例: マオジェル ワンカラー">
+    </div>
+
+    <!-- Price -->
+    <div class="form-group">
+      <label class="form-label">料金（税込）</label>
+      <input class="input-field" type="number" id="editPrice" placeholder="例: 8000" inputmode="numeric">
+      <div class="form-hint">数字のみ入力（¥マーク不要）</div>
+    </div>
+
+    <!-- Duration -->
+    <div class="form-group">
+      <label class="form-label">所要時間（分）</label>
+      <input class="input-field" type="number" id="editMinutes" placeholder="例: 90" inputmode="numeric">
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label class="form-label">説明文</label>
+      <input class="input-field" type="text" id="editDesc" placeholder="例: ドライケア込・フィルイン対応">
+    </div>
+
+    <!-- Category -->
+    <div class="form-group">
+      <label class="form-label">カテゴリ</label>
+      <select class="select-field" id="editCategory">
+        <option value="人気メニュー">人気メニュー</option>
+        <option value="マオジェルメニュー">マオジェルメニュー</option>
+        <option value="デザインメニュー">デザインメニュー</option>
+        <option value="オフ">オフ</option>
+      </select>
+    </div>
+
+    <!-- Type -->
+    <div class="form-group">
+      <label class="form-label">タイプ</label>
+      <select class="select-field" id="editType">
+        <option value="main">メイン施術</option>
+        <option value="off">オフ（付け替え）</option>
+      </select>
+    </div>
+
+    <!-- Toggles -->
+    <div class="form-group">
+      <div class="toggle-row">
+        <span class="toggle-label">メニューを表示する</span>
+        <div class="toggle-switch" id="toggleEnabled" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">人気バッジを表示</span>
+        <div class="toggle-switch" id="togglePopular" onclick="toggleSwitch(this)"></div>
+      </div>
+    </div>
+
+    <!-- Sort Order -->
+    <div class="form-group">
+      <label class="form-label">表示順</label>
+      <input class="input-field" type="number" id="editSort" placeholder="1" inputmode="numeric">
+      <div class="form-hint">小さい数字ほど上に表示されます</div>
+    </div>
+
+    <!-- Delete -->
+    <div id="deleteSection" style="margin-top:32px;">
+      <button class="btn btn-outline btn-sm" style="color:var(--error);border-color:var(--error);width:auto;" onclick="showDeleteConfirm()">このメニューを削除</button>
+      <div id="deleteConfirm" class="delete-confirm" style="display:none">
+        <p>本当に削除しますか？この操作は取り消せません。</p>
+        <div class="btns">
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="hideDeleteConfirm()">キャンセル</button>
+          <button class="btn btn-danger btn-sm" style="flex:1;" onclick="doDelete()">削除する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save bar -->
+  <div class="action-bar">
+    <button class="btn btn-outline" style="flex:1;" onclick="closeEdit()">キャンセル</button>
+    <button class="btn btn-success" style="flex:2;" onclick="saveMenu()">💾 保存する</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwI9uvlhv6pFP6HyxwSKB5PBRV52rWz5eCo9kctBhYcR8RqD3uNOvaRJ53j3AZ5Nhno/exec';
+
+var menus = [];
+var editingMenu = null; // current menu being edited
+var newPhotoData = null; // base64 of new photo
+var newPhotoMime = null;
+var isNewMenu = false;
+
+// ── Login ──
+function doLogin(){
+  var pass = document.getElementById('loginPass').value;
+  if(!pass){ showLoginError('パスワードを入力してください'); return; }
+  showLoading();
+  apiPost({action:'adminLogin', password:pass}).then(function(res){
+    hideLoading();
+    if(res.success){
+      sessionStorage.setItem('yn_admin','1');
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('mainScreen').style.display='block';
+      loadMenus();
+    } else {
+      showLoginError(res.error || 'ログインに失敗しました');
+    }
+  }).catch(function(){
+    hideLoading();
+    showLoginError('通信エラーが発生しました');
+  });
+}
+
+function showLoginError(msg){
+  var el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout(){
+  sessionStorage.removeItem('yn_admin');
+  location.reload();
+}
+
+// ── Auto-login check ──
+window.addEventListener('DOMContentLoaded', function(){
+  if(sessionStorage.getItem('yn_admin') === '1'){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('mainScreen').style.display='block';
+    loadMenus();
+  }
+  // Enter key for login
+  document.getElementById('loginPass').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') doLogin();
+  });
+});
+
+// ── Load Menus ──
+function loadMenus(){
+  showLoading();
+  apiGet({action:'getMenus'}).then(function(res){
+    hideLoading();
+    if(res.success){
+      menus = res.data.menus;
+      menus.sort(function(a,b){ return (a.sortOrder||99) - (b.sortOrder||99); });
+      renderMenuList();
+    } else {
+      showToast(res.error || 'メニュー読み込み失敗', 'error');
+    }
+  }).catch(function(){
+    hideLoading();
+    showToast('通信エラー', 'error');
+  });
+}
+
+function renderMenuList(){
+  var container = document.getElementById('menuListContainer');
+  container.innerHTML = '';
+  var categories = {};
+  var catOrder = ['人気メニュー','マオジェルメニュー','デザインメニュー','オフ'];
+  var catIcons = {'人気メニュー':'💅','マオジェルメニュー':'✨','デザインメニュー':'🎨','オフ':'🔄'};
+  var catColors = {'人気メニュー':'pink','マオジェルメニュー':'amber','デザインメニュー':'blue','オフ':'green'};
+
+  menus.forEach(function(m){
+    var cat = m.category || 'その他';
+    if(!categories[cat]) categories[cat] = [];
+    categories[cat].push(m);
+  });
+
+  catOrder.forEach(function(cat){
+    var items = categories[cat];
+    if(!items || !items.length) return;
+
+    var header = document.createElement('div');
+    header.className = 'cat-header';
+    header.innerHTML = '<div class="cat-icon '+(catColors[cat]||'pink')+'">'+
+      (catIcons[cat]||'📋')+'</div><span>'+cat+' ('+items.length+')</span>';
+    container.appendChild(header);
+
+    items.forEach(function(m){
+      var el = document.createElement('div');
+      el.className = 'menu-item' + (m.enabled ? '' : ' disabled');
+      var thumbHtml = '';
+      if(m.imageUrl){
+        thumbHtml = '<div class="menu-thumb"><img src="'+m.imageUrl+'" onerror="this.parentElement.innerHTML=\'📷\'"></div>';
+      } else {
+        thumbHtml = '<div class="menu-thumb">📷</div>';
+      }
+      var badges = '';
+      if(m.enabled){
+        badges += '<span class="menu-badge badge-on">表示中</span> ';
+      } else {
+        badges += '<span class="menu-badge badge-off">非表示</span> ';
+      }
+      if(m.popular){
+        badges += '<span class="menu-badge badge-popular">人気</span>';
+      }
+
+      el.innerHTML = thumbHtml +
+        '<div class="menu-info">' +
+          '<div class="menu-name">'+m.label+'</div>' +
+          '<div class="menu-meta">¥'+(m.price||0).toLocaleString()+' / '+(m.minutes||0)+'分</div>' +
+          '<div>'+badges+'</div>' +
+        '</div>' +
+        '<div class="menu-arrow">▶</div>';
+      el.onclick = function(){ openEdit(m); };
+      container.appendChild(el);
+    });
+  });
+}
+
+// ── Edit Panel ──
+function openEdit(m){
+  editingMenu = m;
+  isNewMenu = false;
+  newPhotoData = null;
+  newPhotoMime = null;
+
+  document.getElementById('editTitle').textContent = 'メニュー編集';
+  document.getElementById('editName').value = m.label || '';
+  document.getElementById('editPrice').value = m.price || '';
+  document.getElementById('editMinutes').value = m.minutes || '';
+  document.getElementById('editDesc').value = m.description || '';
+  document.getElementById('editCategory').value = m.category || '人気メニュー';
+  document.getElementById('editType').value = m.type || 'main';
+  document.getElementById('editSort').value = m.sortOrder || '';
+
+  var toggleEnabled = document.getElementById('toggleEnabled');
+  toggleEnabled.classList.toggle('on', !!m.enabled);
+  var togglePopular = document.getElementById('togglePopular');
+  togglePopular.classList.toggle('on', !!m.popular);
+
+  // Photo
+  var preview = document.getElementById('photoPreview');
+  var placeholder = document.getElementById('photoPlaceholder');
+  if(m.imageUrl){
+    preview.src = m.imageUrl;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    preview.style.display = 'none';
+    placeholder.style.display = 'flex';
+  }
+
+  document.getElementById('deleteSection').style.display = 'block';
+  hideDeleteConfirm();
+  document.getElementById('editPanel').classList.add('open');
+}
+
+function openNewMenu(){
+  editingMenu = {
+    menuId: 'menu_' + Date.now(),
+    label:'', price:0, minutes:90, type:'main',
+    category:'人気メニュー', imageUrl:'', description:'',
+    sortOrder: menus.length + 1, enabled:true, popular:false
+  };
+  isNewMenu = true;
+  newPhotoData = null;
+  newPhotoMime = null;
+
+  document.getElementById('editTitle').textContent = '新規メニュー追加';
+  document.getElementById('editName').value = '';
+  document.getElementById('editPrice').value = '';
+  document.getElementById('editMinutes').value = '90';
+  document.getElementById('editDesc').value = '';
+  document.getElementById('editCategory').value = '人気メニュー';
+  document.getElementById('editType').value = 'main';
+  document.getElementById('editSort').value = editingMenu.sortOrder;
+
+  document.getElementById('toggleEnabled').classList.add('on');
+  document.getElementById('togglePopular').classList.remove('on');
+
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoPlaceholder').style.display = 'flex';
+  document.getElementById('deleteSection').style.display = 'none';
+
+  document.getElementById('editPanel').classList.add('open');
+}
+
+function closeEdit(){
+  document.getElementById('editPanel').classList.remove('open');
+  editingMenu = null;
+}
+
+// ── Toggle switch ──
+function toggleSwitch(el){
+  el.classList.toggle('on');
+}
+
+// ── Photo selection ──
+function onPhotoSelected(e){
+  var file = e.target.files[0];
+  if(!file) return;
+
+  // Resize image for upload (max 800px)
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function(){
+      var canvas = document.createElement('canvas');
+      var maxSize = 800;
+      var w = img.width, h = img.height;
+      if(w > maxSize || h > maxSize){
+        if(w > h){ h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      newPhotoData = dataUrl.split(',')[1]; // base64 part
+      newPhotoMime = 'image/jpeg';
+
+      // Show preview
+      document.getElementById('photoPreview').src = dataUrl;
+      document.getElementById('photoPreview').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Save Menu ──
+function saveMenu(){
+  if(!editingMenu) return;
+  var name = document.getElementById('editName').value.trim();
+  if(!name){ showToast('メニュー名を入力してください','error'); return; }
+
+  var price = parseInt(document.getElementById('editPrice').value) || 0;
+  var minutes = parseInt(document.getElementById('editMinutes').value) || 0;
+  var desc = document.getElementById('editDesc').value.trim();
+  var category = document.getElementById('editCategory').value;
+  var type = document.getElementById('editType').value;
+  var sort = parseInt(document.getElementById('editSort').value) || 1;
+  var enabled = document.getElementById('toggleEnabled').classList.contains('on');
+  var popular = document.getElementById('togglePopular').classList.contains('on');
+
+  showLoading();
+
+  var updates = {
+    label: name,
+    price: price,
+    minutes: minutes,
+    description: desc,
+    category: category,
+    type: type,
+    sortOrder: sort,
+    enabled: enabled,
+    popular: popular
+  };
+
+  // If we have a new photo, upload first
+  var chain = Promise.resolve();
+  if(newPhotoData){
+    chain = apiPost({
+      action:'uploadImage',
+      menuId: editingMenu.menuId,
+      imageData: newPhotoData,
+      mimeType: newPhotoMime
+    }).then(function(res){
+      if(res.success){
+        updates.imageUrl = res.data.imageUrl;
+      } else {
+        showToast('写真のアップロードに失敗: '+(res.error||''),'error');
+      }
+    });
+  }
+
+  chain.then(function(){
+    return apiPost({
+      action:'updateMenu',
+      menuId: editingMenu.menuId,
+      isNew: isNewMenu,
+      updates: updates
+    });
+  }).then(function(res){
+    hideLoading();
+    if(res.success){
+      showToast('保存しました！','success');
+      closeEdit();
+      loadMenus(); // Refresh list
+    } else {
+      showToast('保存に失敗: '+(res.error||''),'error');
+    }
+  }).catch(function(err){
+    hideLoading();
+    showToast('通信エラー','error');
+    console.error(err);
+  });
+}
+
+// ── Delete ──
+function showDeleteConfirm(){ document.getElementById('deleteConfirm').style.display='block'; }
+function hideDeleteConfirm(){ document.getElementById('deleteConfirm').style.display='none'; }
+
+function doDelete(){
+  if(!editingMenu) return;
+  showLoading();
+  apiPost({action:'deleteMenu', menuId:editingMenu.menuId}).then(function(res){
+    hideLoading();
+    if(res.success){
+      showToast('削除しました','success');
+      closeEdit();
+      loadMenus();
+    } else {
+      showToast('削除に失敗: '+(res.error||''),'error');
+    }
+  }).catch(function(){
+    hideLoading();
+    showToast('通信エラー','error');
+  });
+}
+
+// ── API Helpers ──
+function apiGet(params){
+  var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
+  return fetch(GAS_URL+'?'+qs).then(function(r){ return r.json(); });
+}
+function apiPost(body){
+  return fetch(GAS_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify(body)
+  }).then(function(r){ return r.json(); });
+}
+
+// ── UI Helpers ──
+function showLoading(){ document.getElementById('loading').classList.add('show'); }
+function hideLoading(){ document.getElementById('loading').classList.remove('show'); }
+
+function showToast(msg, type){
+  var old = document.querySelector('.toast');
+  if(old) old.remove();
+  var t = document.createElement('div');
+  t.className = 'toast toast-' + (type||'success');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); },400); }, 2500);
+}
+</script>
+</body>
+</html>

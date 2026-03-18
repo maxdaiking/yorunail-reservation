@@ -927,6 +927,35 @@ body {
   line-height: 1.6;
 }
 
+/* ── メニュー写真 ── */
+.menu-card {
+  position: relative;
+}
+.menu-photo {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  object-fit: cover;
+  display: block;
+  background: var(--border-light);
+}
+.menu-card-inner {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 8px;
+}
+.menu-card.has-photo .menu-check { position:absolute; top:8px; right:8px; z-index:5; }
+.menu-card.has-photo .menu-check .menu-check-icon {
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.menu-card.has-photo.selected .menu-check .menu-check-icon {
+  background: var(--primary); color: #fff;
+}
+
 
 /* ── 以下: HTML未使用の改善CSSをクリーンアップ済み ── */
 
@@ -1089,265 +1118,12 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
 
   <!-- ===== STEP 1: メニュー選択 ===== -->
   <div id="sec1" class="section visible">
-
-    <!-- 人気メニュー（アコーディオン） -->
-    <div class="card">
-      <button class="accordion-header" aria-expanded="true" onclick="toggleAccordion(this)">
-        <div class="accordion-toggle">
-          <div class="card-icon pink">💅</div>
-          <span>人気メニュー</span>
-        </div>
-        <div class="accordion-badge">4</div>
-        <div class="accordion-arrow">▼</div>
-      </button>
-      <div class="accordion-content">
-      <div class="card-body">
-        <div class="menu-list">
-          <div class="menu-card" data-id="maoOnecolor" onclick="toggleMenu('maoOnecolor')">
-            <span class="popular-badge">人気No.1</span>
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">マオジェル ワンカラー</div>
-              <div class="menu-desc">ドライケア込・フィルイン対応</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥8,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="magnetFlash" onclick="toggleMenu('magnetFlash')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">マグネット / フラッシュネイル</div>
-              <div class="menu-desc">トレンドのマグネットデザイン</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥7,980</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="simpleNail" onclick="toggleMenu('simpleNail')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">シンプルネイル</div>
-              <div class="menu-desc">オフィスにもぴったり</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥7,980</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="onecolor" onclick="toggleMenu('onecolor')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">ワンカラー</div>
-              <div class="menu-desc">ハンドジェルネイル・ドライケア込</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥7,700</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- メニューはAPIから動的に生成されます -->
+    <div id="menuDynamic">
+      <div style="text-align:center;padding:40px 0;color:var(--text-muted);font-size:0.9rem;">
+        メニューを読み込み中...
       </div>
     </div>
-
-    <!-- マオジェルメニュー（アコーディオン） -->
-    <div class="card">
-      <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">
-        <div class="accordion-toggle">
-          <div class="card-icon amber">✨</div>
-          <span>マオジェルメニュー</span>
-        </div>
-        <div class="accordion-badge">7</div>
-        <div class="accordion-arrow">▼</div>
-      </button>
-      <div class="accordion-content closed">
-      <div class="card-body">
-        <div class="menu-list">
-          <div class="menu-card" data-id="maoSet" onclick="toggleMenu('maoSet')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">お得なマオセット</div>
-              <div class="menu-desc">ワンカラー＋スワロフスキーアート</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥10,500</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="maoFlower" onclick="toggleMenu('maoFlower')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">マオジェル 花びらネイル</div>
-              <div class="menu-desc">上品な花びらデザイン</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥11,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="maoLameFrench" onclick="toggleMenu('maoLameFrench')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">マオラメフレンチ</div>
-              <div class="menu-desc">キラキラのフレンチデザイン</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥11,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="maoShower" onclick="toggleMenu('maoShower')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">マオシャワー</div>
-              <div class="menu-desc">繊細なシャワーデザイン</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥12,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="maoGrain" onclick="toggleMenu('maoGrain')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">ひと粒置きネイル</div>
-              <div class="menu-desc">さりげないアクセント</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥10,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="maoMilkCafe" onclick="toggleMenu('maoMilkCafe')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">ミルグラ / カフェグラ</div>
-              <div class="menu-desc">グラデーションデザイン</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥11,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="maoKirabira" onclick="toggleMenu('maoKirabira')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">キラびらネイル</div>
-              <div class="menu-desc">華やかな輝き</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥10,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <!-- デザインメニュー（アコーディオン） -->
-    <div class="card">
-      <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">
-        <div class="accordion-toggle">
-          <div class="card-icon blue">🎨</div>
-          <span>デザインメニュー</span>
-        </div>
-        <div class="accordion-badge">3</div>
-        <div class="accordion-arrow">▼</div>
-      </button>
-      <div class="accordion-content closed">
-      <div class="card-body">
-        <div class="menu-list">
-          <div class="menu-card" data-id="glassFrench" onclick="toggleMenu('glassFrench')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">yorunail風ガラスフレンチ</div>
-              <div class="menu-desc">当サロンオリジナルデザイン</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥9,900</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="select2art" onclick="toggleMenu('select2art')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">選べる2本アート</div>
-              <div class="menu-desc">お好きな2本にアートをプラス</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥8,000</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="tarashikomi" onclick="toggleMenu('tarashikomi')">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">たらしこみフラワー</div>
-              <div class="menu-desc">水彩風の繊細なフラワーアート</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">¥9,900</div>
-              <div class="menu-duration">90分</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <!-- オフ -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon green">🔄</div>
-        <div class="card-title">オフ（付け替え時）</div>
-      </div>
-      <div class="card-body">
-        <div class="menu-list">
-          <div class="menu-card" data-id="offSelf" onclick="toggleMenu('offSelf')" id="mc-offSelf">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">自店オフ</div>
-              <div class="menu-desc">当サロンで付けたジェルのオフ</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">無料</div>
-              <div class="menu-duration">施術内</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="offOther" onclick="toggleMenu('offOther')" id="mc-offOther">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">他店オフ</div>
-              <div class="menu-desc">他サロンで付けたジェルのオフ</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">無料</div>
-              <div class="menu-duration">施術内</div>
-            </div>
-          </div>
-          <div class="menu-card" data-id="offLong" onclick="toggleMenu('offLong')" id="mc-offLong">
-            <div class="menu-check"><span class="menu-check-icon">✓</span></div>
-            <div class="menu-content">
-              <div class="menu-name">他店オフ（長さ出し・スカルプ）</div>
-              <div class="menu-desc">ロングネイル等のオフ</div>
-            </div>
-            <div class="menu-price-area">
-              <div class="menu-price">+¥1,000</div>
-              <div class="menu-duration">施術内</div>
-            </div>
-          </div>
-        </div>
-        <div class="option-hint">
-          <span class="hint-icon">i</span>
-          メインメニューを選ぶとオフが選べます
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <!-- ===== STEP 2: 日時選択 ===== -->
@@ -1525,29 +1301,27 @@ button, .menu-card, .accordion-header { user-select: none; -webkit-user-select: 
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbwI9uvlhv6pFP6HyxwSKB5PBRV52rWz5eCo9kctBhYcR8RqD3uNOvaRJ53j3AZ5Nhno/exec';
 var LIFF_ID = '2009489511-RWe0J1qP';
 
-// ── メニュー定義 ──
-var M = {
-  // 人気メニュー
-  maoOnecolor:   { name:'マオジェル ワンカラー',       dur:90, price:8000,  type:'main' },
-  magnetFlash:   { name:'マグネット/フラッシュネイル',   dur:90, price:7980,  type:'main' },
-  simpleNail:    { name:'シンプルネイル',               dur:90, price:7980,  type:'main' },
-  onecolor:      { name:'ワンカラー',                  dur:90, price:7700,  type:'main' },
-  // マオジェルメニュー
-  maoSet:        { name:'お得なマオセット',             dur:90, price:10500, type:'main' },
-  maoFlower:     { name:'マオジェル 花びらネイル',      dur:90, price:11000, type:'main' },
-  maoLameFrench: { name:'マオラメフレンチ',            dur:90, price:11000, type:'main' },
-  maoShower:     { name:'マオシャワー',                dur:90, price:12000, type:'main' },
-  maoGrain:      { name:'ひと粒置きネイル',            dur:90, price:10000, type:'main' },
-  maoMilkCafe:   { name:'ミルグラ/カフェグラ',         dur:90, price:11000, type:'main' },
-  maoKirabira:   { name:'キラびらネイル',              dur:90, price:10000, type:'main' },
-  // デザインメニュー
-  glassFrench:   { name:'yorunail風ガラスフレンチ',    dur:90, price:9900,  type:'main' },
-  select2art:    { name:'選べる2本アート',             dur:90, price:8000,  type:'main' },
-  tarashikomi:   { name:'たらしこみフラワー',          dur:90, price:9900,  type:'main' },
-  // オフ（付け替え時）
-  offSelf:       { name:'自店オフ',                   dur:0,  price:0,     type:'off' },
-  offOther:      { name:'他店オフ',                   dur:0,  price:0,     type:'off' },
-  offLong:       { name:'他店オフ（長さ出し・スカルプ）', dur:0,  price:1000,  type:'off' }
+// ── メニュー定義（APIから動的に読み込み、フォールバック付き） ──
+var M = {};
+var menuDataRaw = []; // API生データ保持
+var FALLBACK_MENUS = {
+  maoOnecolor:   { name:'マオジェル ワンカラー',       dur:90, price:8000,  type:'main', category:'人気メニュー', desc:'ドライケア込・フィルイン対応', popular:true, imageUrl:'' },
+  magnetFlash:   { name:'マグネット/フラッシュネイル',   dur:90, price:7980,  type:'main', category:'人気メニュー', desc:'トレンドのマグネットデザイン', popular:false, imageUrl:'' },
+  simpleNail:    { name:'シンプルネイル',               dur:90, price:7980,  type:'main', category:'人気メニュー', desc:'オフィスにもぴったり', popular:false, imageUrl:'' },
+  onecolor:      { name:'ワンカラー',                  dur:90, price:7700,  type:'main', category:'人気メニュー', desc:'ハンドジェルネイル・ドライケア込', popular:false, imageUrl:'' },
+  maoSet:        { name:'お得なマオセット',             dur:90, price:10500, type:'main', category:'マオジェルメニュー', desc:'ワンカラー＋スワロフスキーアート', popular:false, imageUrl:'' },
+  maoFlower:     { name:'マオジェル 花びらネイル',      dur:90, price:11000, type:'main', category:'マオジェルメニュー', desc:'上品な花びらデザイン', popular:false, imageUrl:'' },
+  maoLameFrench: { name:'マオラメフレンチ',            dur:90, price:11000, type:'main', category:'マオジェルメニュー', desc:'キラキラのフレンチデザイン', popular:false, imageUrl:'' },
+  maoShower:     { name:'マオシャワー',                dur:90, price:12000, type:'main', category:'マオジェルメニュー', desc:'繊細なシャワーデザイン', popular:false, imageUrl:'' },
+  maoGrain:      { name:'ひと粒置きネイル',            dur:90, price:10000, type:'main', category:'マオジェルメニュー', desc:'さりげないアクセント', popular:false, imageUrl:'' },
+  maoMilkCafe:   { name:'ミルグラ/カフェグラ',         dur:90, price:11000, type:'main', category:'マオジェルメニュー', desc:'グラデーションデザイン', popular:false, imageUrl:'' },
+  maoKirabira:   { name:'キラびらネイル',              dur:90, price:10000, type:'main', category:'マオジェルメニュー', desc:'華やかな輝き', popular:false, imageUrl:'' },
+  glassFrench:   { name:'yorunail風ガラスフレンチ',    dur:90, price:9900,  type:'main', category:'デザインメニュー', desc:'当サロンオリジナルデザイン', popular:false, imageUrl:'' },
+  select2art:    { name:'選べる2本アート',             dur:90, price:8000,  type:'main', category:'デザインメニュー', desc:'お好きな2本にアートをプラス', popular:false, imageUrl:'' },
+  tarashikomi:   { name:'たらしこみフラワー',          dur:90, price:9900,  type:'main', category:'デザインメニュー', desc:'水彩風の繊細なフラワーアート', popular:false, imageUrl:'' },
+  offSelf:       { name:'自店オフ',                   dur:0,  price:0,     type:'off',  category:'オフ', desc:'当サロンで付けたジェルのオフ', popular:false, imageUrl:'' },
+  offOther:      { name:'他店オフ',                   dur:0,  price:0,     type:'off',  category:'オフ', desc:'他サロンで付けたジェルのオフ', popular:false, imageUrl:'' },
+  offLong:       { name:'他店オフ（長さ出し・スカルプ）', dur:0,  price:1000,  type:'off',  category:'オフ', desc:'ロングネイル等のオフ', popular:false, imageUrl:'' }
 };
 var DOW = ['日','月','火','水','木','金','土'];
 var MAX_DAYS = 60;
@@ -1564,6 +1338,162 @@ var pickedTime = null;
 var slotsCache = {};
 var loadedRange = null;
 
+// ── メニューAPIから読み込み ──
+async function loadMenusFromAPI(){
+  try {
+    var res = await apiGet({action:'getMenus'});
+    if(res.success && res.data && res.data.menus && res.data.menus.length > 0){
+      M = {};
+      menuDataRaw = res.data.menus;
+      menuDataRaw.forEach(function(m){
+        if(!m.enabled) return; // 非表示メニューはスキップ
+        M[m.menuId] = {
+          name: m.label,
+          dur: parseInt(m.minutes)||0,
+          price: parseInt(m.price)||0,
+          type: m.type || 'main',
+          category: m.category || '',
+          desc: m.description || '',
+          popular: !!m.popular,
+          imageUrl: m.imageUrl || ''
+        };
+      });
+      console.log('[API] Loaded '+Object.keys(M).length+' menus from API');
+      return true;
+    }
+  } catch(e){ console.error('Menu API error:', e); }
+  return false;
+}
+
+function useFallbackMenus(){
+  M = {};
+  Object.keys(FALLBACK_MENUS).forEach(function(id){
+    var fm = FALLBACK_MENUS[id];
+    M[id] = { name:fm.name, dur:fm.dur, price:fm.price, type:fm.type, category:fm.category, desc:fm.desc, popular:fm.popular, imageUrl:fm.imageUrl };
+  });
+  console.log('[FALLBACK] Using hardcoded menus');
+}
+
+// ── メニューHTML動的生成 ──
+function buildMenuHTML(){
+  var container = document.getElementById('menuDynamic');
+  if(!container) return;
+  container.innerHTML = '';
+
+  // カテゴリ順とアイコン設定
+  var catOrder = ['人気メニュー','マオジェルメニュー','デザインメニュー','オフ'];
+  var catIcons = {'人気メニュー':'💅','マオジェルメニュー':'✨','デザインメニュー':'🎨','オフ':'🔄'};
+  var catColors = {'人気メニュー':'pink','マオジェルメニュー':'amber','デザインメニュー':'blue','オフ':'green'};
+
+  // カテゴリごとにメニューをグループ化
+  var groups = {};
+  Object.keys(M).forEach(function(id){
+    var m = M[id];
+    var cat = m.category || (m.type === 'off' ? 'オフ' : 'その他');
+    if(!groups[cat]) groups[cat] = [];
+    groups[cat].push({id:id, menu:m});
+  });
+
+  catOrder.forEach(function(cat){
+    var items = groups[cat];
+    if(!items || !items.length) return;
+
+    var isOff = (cat === 'オフ');
+    var isFirst = (cat === catOrder[0]);
+    var card = document.createElement('div');
+    card.className = 'card';
+
+    if(!isOff){
+      // アコーディオンカード
+      var header = document.createElement('button');
+      header.className = 'accordion-header';
+      header.setAttribute('aria-expanded', isFirst ? 'true' : 'false');
+      header.onclick = function(){ toggleAccordion(this); };
+      header.innerHTML = '<div class="accordion-toggle"><div class="card-icon '+(catColors[cat]||'pink')+'">'+(catIcons[cat]||'📋')+'</div><span>'+cat+'</span></div>'+
+        '<div class="accordion-badge">'+items.length+'</div><div class="accordion-arrow">▼</div>';
+      card.appendChild(header);
+
+      var content = document.createElement('div');
+      content.className = 'accordion-content' + (isFirst ? '' : ' closed');
+      var body = document.createElement('div');
+      body.className = 'card-body';
+      var list = document.createElement('div');
+      list.className = 'menu-list';
+
+      items.forEach(function(item){
+        list.appendChild(buildMenuCard(item.id, item.menu));
+      });
+
+      body.appendChild(list);
+      content.appendChild(body);
+      card.appendChild(content);
+    } else {
+      // オフセクション（アコーディオンなし）
+      var cardHeader = document.createElement('div');
+      cardHeader.className = 'card-header';
+      cardHeader.innerHTML = '<div class="card-icon '+(catColors[cat]||'green')+'">'+(catIcons[cat]||'🔄')+'</div><div class="card-title">オフ（付け替え時）</div>';
+      card.appendChild(cardHeader);
+
+      var body = document.createElement('div');
+      body.className = 'card-body';
+      var list = document.createElement('div');
+      list.className = 'menu-list';
+
+      items.forEach(function(item){
+        var mc = buildMenuCard(item.id, item.menu);
+        mc.id = 'mc-' + item.id;
+        list.appendChild(mc);
+      });
+
+      var hint = document.createElement('div');
+      hint.className = 'option-hint';
+      hint.innerHTML = '<span class="hint-icon">i</span> メインメニューを選ぶとオフが選べます';
+      body.appendChild(list);
+      body.appendChild(hint);
+      card.appendChild(body);
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function buildMenuCard(id, m){
+  var card = document.createElement('div');
+  card.className = 'menu-card' + (m.imageUrl ? ' has-photo' : '');
+  card.setAttribute('data-id', id);
+  card.onclick = function(){ toggleMenu(id); };
+
+  var html = '';
+
+  // 人気バッジ
+  if(m.popular){
+    html += '<span class="popular-badge">人気No.1</span>';
+  }
+
+  // 写真
+  if(m.imageUrl){
+    html += '<img class="menu-photo" src="'+m.imageUrl+'" onerror="this.style.display=\'none\'" loading="lazy">';
+  }
+
+  // チェックマーク
+  html += '<div class="menu-check"><span class="menu-check-icon">✓</span></div>';
+
+  // 内容部分（写真ありの場合はmenu-card-innerで囲む）
+  var priceDisplay = m.price > 0 ? '¥'+m.price.toLocaleString() : (m.type==='off' ? '無料' : '¥0');
+  var durDisplay = m.dur > 0 ? m.dur+'分' : '施術内';
+  if(id === 'offLong' && m.price > 0) priceDisplay = '+¥'+m.price.toLocaleString();
+
+  html += '<div class="menu-card-inner">';
+  html += '<div class="menu-content"><div class="menu-name">'+m.name+'</div>';
+  if(m.desc) html += '<div class="menu-desc">'+m.desc+'</div>';
+  html += '</div>';
+  html += '<div class="menu-price-area"><div class="menu-price">'+priceDisplay+'</div><div class="menu-duration">'+durDisplay+'</div></div>';
+  html += '</div>';
+
+  card.innerHTML = html;
+  return card;
+}
+
 // ── LIFF 初期化 ──
 window.addEventListener('DOMContentLoaded', async function(){
   try {
@@ -1571,6 +1501,10 @@ window.addEventListener('DOMContentLoaded', async function(){
     if (!liff.isLoggedIn()) { liff.login(); return; }
     var profile = await liff.getProfile();
     uid = profile.userId;
+    // メニュー読み込み（API → フォールバック）
+    var apiLoaded = await loadMenusFromAPI();
+    if(!apiLoaded) useFallbackMenus();
+    buildMenuHTML();
     await loadCustomer();
     var now = new Date();
     cY = now.getFullYear();
@@ -1579,6 +1513,9 @@ window.addEventListener('DOMContentLoaded', async function(){
     hideLoading();
   } catch(e) {
     console.error('LIFF init error:', e);
+    // フォールバックメニューでUI表示
+    useFallbackMenus();
+    buildMenuHTML();
     toast('読み込みに失敗しました。再度お試しください。');
     hideLoading();
   }
@@ -1976,7 +1913,7 @@ window.closeOtherAccordions = function(keepOpenCard){
 </script>
 
 <!-- バージョン確認用（デバッグ） -->
-<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v2.2-20260317</div>
+<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v3.0-20260318</div>
 
 </body>
 </html>
