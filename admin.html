@@ -2,7 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💅</text></svg>">
 <title>メニュー管理 | YoruNail</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,6 +37,8 @@ body {
   background:var(--bg); color:var(--text); line-height:1.7;
   -webkit-text-size-adjust:100%; padding-bottom:40px;
 }
+body.no-scroll { overflow:hidden; position:fixed; width:100%; }
+html { padding-top:env(safe-area-inset-top); }
 
 /* Header */
 .header {
@@ -207,7 +212,7 @@ body {
 
 /* Floating action */
 .fab {
-  position:fixed; bottom:24px; right:20px;
+  position:fixed; bottom:calc(24px + env(safe-area-inset-bottom)); right:20px;
   width:56px; height:56px; border-radius:50%;
   background:linear-gradient(135deg,var(--primary),var(--primary-dark));
   color:#fff; border:none; font-size:24px; font-weight:700;
@@ -246,12 +251,28 @@ body {
 /* Action bar */
 .action-bar {
   position:fixed; bottom:0; left:0; right:0;
-  background:var(--bg-card); padding:12px 16px 24px;
+  background:var(--bg-card); padding:12px 16px calc(12px + env(safe-area-inset-bottom));
   border-top:1px solid var(--border-light);
   box-shadow:0 -4px 16px rgba(50,30,30,0.08);
   z-index:50; display:flex; gap:10px;
   max-width:480px; margin:0 auto;
 }
+
+/* Empty state */
+.empty-state {
+  text-align:center; padding:48px 20px;
+  color:var(--text-muted);
+}
+.empty-state .icon { font-size:48px; margin-bottom:12px; }
+.empty-state .title { font-size:1rem; font-weight:700; color:var(--text-secondary); margin-bottom:4px; }
+.empty-state .desc { font-size:0.85rem; }
+
+/* Pull-to-refresh hint */
+.refresh-hint {
+  text-align:center; padding:12px; font-size:0.75rem; color:var(--text-muted);
+  cursor:pointer;
+}
+.refresh-hint:active { color:var(--primary); }
 
 /* Delete confirm */
 .delete-confirm {
@@ -309,13 +330,14 @@ body {
     <div class="sub">メニューの写真・名前・料金を変更できます</div>
   </div>
 
+  <div class="refresh-hint" onclick="loadMenus()">タップしてメニューを更新</div>
   <div class="container" id="menuListContainer">
     <!-- Populated by JS -->
   </div>
 
   <div class="logout-bar">
     <button class="logout-btn" onclick="doLogout()">ログアウト</button>
-    <div style="margin-top:8px;font-size:10px;color:#ccc;">YoruNail Admin v1.0</div>
+    <div style="margin-top:8px;font-size:10px;color:#ccc;">YoruNail Admin v1.1</div>
   </div>
 
   <!-- FAB: Add new menu -->
@@ -328,7 +350,7 @@ body {
     <button class="btn btn-outline btn-sm" onclick="closeEdit()" style="width:auto;padding:8px 14px;">✕ 戻る</button>
     <h2 id="editTitle">メニュー編集</h2>
   </div>
-  <div class="edit-body" style="padding-bottom:100px;">
+  <div class="edit-body" style="padding-bottom:calc(100px + env(safe-area-inset-bottom));">
 
     <!-- Photo -->
     <div class="form-group">
@@ -509,6 +531,10 @@ function loadMenus(){
 function renderMenuList(){
   var container = document.getElementById('menuListContainer');
   container.innerHTML = '';
+  if(!menus || menus.length === 0){
+    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="title">メニューがありません</div><div class="desc">右下の＋ボタンから追加してください</div></div>';
+    return;
+  }
   var categories = {};
   var catOrder = ['人気メニュー','マオジェルメニュー','デザインメニュー','オフ'];
   var catIcons = {'人気メニュー':'💅','マオジェルメニュー':'✨','デザインメニュー':'🎨','オフ':'🔄'};
@@ -598,6 +624,7 @@ function openEdit(m){
   document.getElementById('deleteSection').style.display = 'block';
   hideDeleteConfirm();
   document.getElementById('editPanel').classList.add('open');
+  document.body.classList.add('no-scroll');
 }
 
 function openNewMenu(){
@@ -628,10 +655,12 @@ function openNewMenu(){
   document.getElementById('deleteSection').style.display = 'none';
 
   document.getElementById('editPanel').classList.add('open');
+  document.body.classList.add('no-scroll');
 }
 
 function closeEdit(){
   document.getElementById('editPanel').classList.remove('open');
+  document.body.classList.remove('no-scroll');
   editingMenu = null;
 }
 
@@ -704,9 +733,10 @@ function saveMenu(){
     popular: popular
   };
 
-  // If we have a new photo, upload first
+  // If we have a new photo, upload first (show specific message)
   var chain = Promise.resolve();
   if(newPhotoData){
+    showToast('写真をアップロード中...','success');
     chain = apiPost({
       action:'uploadImage',
       menuId: editingMenu.menuId,
