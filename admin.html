@@ -160,7 +160,7 @@ html { padding-top:env(safe-area-inset-top); }
 
 /* Photo upload */
 .photo-upload-area {
-  width:100%; aspect-ratio:4/3; border:2px dashed var(--border);
+  width:100%; aspect-ratio:1/1; border:2px dashed var(--border);
   border-radius:14px; display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:8px;
   cursor:pointer; transition:all 0.2s; overflow:hidden;
@@ -367,7 +367,7 @@ html { padding-top:env(safe-area-inset-top); }
         </div>
       </div>
       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
-      <div class="form-hint">推奨: 正方形〜横長の写真（4:3）</div>
+      <div class="form-hint">推奨: 正方形の写真（1:1）がきれいに表示されます</div>
     </div>
 
     <!-- Name -->

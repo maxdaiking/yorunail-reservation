@@ -933,10 +933,15 @@ body {
 .menu-card {
   position: relative;
 }
+.menu-card.has-photo {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
 .menu-photo {
   width: 100%;
-  aspect-ratio: 16/9;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
   object-fit: cover;
   display: block;
   background: var(--border-light);
@@ -944,7 +949,7 @@ body {
 .menu-card-inner {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
+  padding: 12px 14px;
   gap: 8px;
   flex: 1;
   min-width: 0;
@@ -1917,7 +1922,7 @@ window.closeOtherAccordions = function(keepOpenCard){
 </script>
 
 <!-- バージョン確認用（デバッグ） -->
-<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v3.1-20260320</div>
+<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v3.2-20260320</div>
 
 </body>
 </html>
