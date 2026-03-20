@@ -357,6 +357,7 @@ body {
 .menu-price-area {
   text-align: right;
   flex-shrink: 0;
+  min-width: 80px;
   position: relative;
   z-index: 1;
 }
@@ -364,6 +365,7 @@ body {
   font-size: 1.08rem;
   font-weight: 700;
   color: var(--primary-dark);
+  white-space: nowrap;
 }
 .menu-duration {
   font-size: 0.7rem;
@@ -944,6 +946,8 @@ body {
   align-items: center;
   padding: 10px 12px;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 .menu-card.has-photo .menu-check { position:absolute; top:8px; right:8px; z-index:5; }
 .menu-card.has-photo .menu-check .menu-check-icon {
@@ -1913,7 +1917,7 @@ window.closeOtherAccordions = function(keepOpenCard){
 </script>
 
 <!-- バージョン確認用（デバッグ） -->
-<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v3.0-20260318</div>
+<div style="text-align:center;padding:8px;font-size:10px;color:#ccc;">v3.1-20260320</div>
 
 </body>
 </html>
