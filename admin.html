@@ -282,6 +282,30 @@ html { padding-top:env(safe-area-inset-top); }
 .delete-confirm p { font-size:0.9rem; margin-bottom:12px; color:var(--error); font-weight:600; }
 .delete-confirm .btns { display:flex; gap:8px; }
 
+/* Tab bar */
+.tab-bar { display:flex; background:var(--bg-card); border-bottom:2px solid var(--border-light); }
+.tab-btn { flex:1; padding:12px 0; text-align:center; font-size:0.85rem; font-weight:700; color:var(--text-muted); background:none; border:none; cursor:pointer; border-bottom:3px solid transparent; font-family:inherit; }
+.tab-btn.active { color:var(--primary-dark); border-bottom-color:var(--primary); }
+
+/* Reservation list */
+.rsv-item { background:var(--bg-card); border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:var(--shadow-sm); border:1px solid var(--border-light); }
+.rsv-item.cancelled { opacity:0.4; }
+.rsv-date { font-size:0.8rem; font-weight:700; color:var(--primary-dark); }
+.rsv-name { font-size:1rem; font-weight:700; margin-top:2px; }
+.rsv-detail { font-size:0.8rem; color:var(--text-secondary); margin-top:2px; }
+.rsv-contact { font-size:0.75rem; color:var(--text-muted); margin-top:4px; }
+.rsv-actions { display:flex; gap:8px; margin-top:10px; }
+.rsv-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.65rem; font-weight:700; }
+.rsv-badge-ok { background:var(--success-light); color:var(--success); }
+.rsv-badge-cancel { background:var(--error-light); color:var(--error); }
+.rsv-filter-bar { display:flex; gap:8px; padding:8px 0; overflow-x:auto; }
+.rsv-filter-btn { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); font-size:0.75rem; font-weight:600; color:var(--text-secondary); white-space:nowrap; cursor:pointer; font-family:inherit; }
+.rsv-filter-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+/* Edit reservation panel */
+.rsv-edit-panel { position:fixed; inset:0; z-index:200; background:var(--bg); overflow-y:auto; transform:translateX(100%); transition:transform 0.3s ease; }
+.rsv-edit-panel.open { transform:translateX(0); }
+
 /* Logout */
 .logout-bar {
   text-align:center; padding:24px 16px;
@@ -326,22 +350,47 @@ html { padding-top:env(safe-area-inset-top); }
 <!-- Main Screen -->
 <div id="mainScreen" style="display:none">
   <div class="header">
-    <h1>メニュー管理</h1>
-    <div class="sub">メニューの写真・名前・料金を変更できます</div>
+    <h1>YoruNail 管理画面</h1>
+    <div class="sub">メニュー・予約を管理できます</div>
   </div>
 
-  <div class="refresh-hint" onclick="loadMenus()">タップしてメニューを更新</div>
-  <div class="container" id="menuListContainer">
-    <!-- Populated by JS -->
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('menu')" id="tabMenu">📋 メニュー</button>
+    <button class="tab-btn" onclick="switchTab('rsv')" id="tabRsv">📅 予約</button>
+  </div>
+
+  <!-- Menu tab content (existing) -->
+  <div id="tabMenuContent">
+
+    <div class="refresh-hint" onclick="loadMenus()">タップしてメニューを更新</div>
+    <div class="container" id="menuListContainer">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- Reservation tab content (new) -->
+  <div id="tabRsvContent" style="display:none">
+    <div class="container">
+      <div class="rsv-filter-bar">
+        <button class="rsv-filter-btn active" onclick="filterRsv('upcoming')" id="filterUpcoming">今後の予約</button>
+        <button class="rsv-filter-btn" onclick="filterRsv('past')" id="filterPast">過去</button>
+        <button class="rsv-filter-btn" onclick="filterRsv('cancelled')" id="filterCancelled">キャンセル</button>
+        <button class="rsv-filter-btn" onclick="filterRsv('all')" id="filterAll">すべて</button>
+      </div>
+      <div id="rsvListContainer">
+        <!-- Populated by JS -->
+      </div>
+    </div>
   </div>
 
   <div class="logout-bar">
     <button class="logout-btn" onclick="doLogout()">ログアウト</button>
-    <div style="margin-top:8px;font-size:10px;color:#ccc;">YoruNail Admin v1.1</div>
+    <div style="margin-top:8px;font-size:10px;color:#ccc;">YoruNail Admin v2.0</div>
   </div>
 
-  <!-- FAB: Add new menu -->
-  <button class="fab" onclick="openNewMenu()" title="新しいメニューを追加">＋</button>
+  <!-- FAB: Add new menu (only visible on menu tab) -->
+  <button class="fab" id="fabMenu" onclick="openNewMenu()" title="新しいメニューを追加">＋</button>
 </div>
 
 <!-- Edit Panel (slides in from right) -->
@@ -451,6 +500,59 @@ html { padding-top:env(safe-area-inset-top); }
   <div class="action-bar">
     <button class="btn btn-outline" style="flex:1;" onclick="closeEdit()">キャンセル</button>
     <button class="btn btn-success" style="flex:2;" onclick="saveMenu()">💾 保存する</button>
+  </div>
+</div>
+
+<!-- Reservation Edit Panel -->
+<div id="rsvEditPanel" class="rsv-edit-panel">
+  <div class="edit-header">
+    <button class="btn btn-outline btn-sm" onclick="closeRsvEdit()" style="width:auto;padding:8px 14px;">✕ 戻る</button>
+    <h2 id="rsvEditTitle">予約詳細</h2>
+  </div>
+  <div class="edit-body" style="padding-bottom:calc(100px + env(safe-area-inset-bottom));">
+    <div class="form-group">
+      <label class="form-label">お客様名</label>
+      <div id="rsvCustName" style="font-size:1.1rem;font-weight:700;padding:8px 0;"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">連絡先</label>
+      <div id="rsvCustContact" style="font-size:0.85rem;padding:4px 0;"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">予約日</label>
+      <input class="input-field" type="date" id="rsvEditDate">
+    </div>
+    <div class="form-group">
+      <label class="form-label">予約時間</label>
+      <input class="input-field" type="time" id="rsvEditTime">
+    </div>
+    <div class="form-group">
+      <label class="form-label">メニュー</label>
+      <input class="input-field" type="text" id="rsvEditMenu">
+    </div>
+    <div class="form-group">
+      <label class="form-label">料金</label>
+      <div id="rsvEditPrice" style="font-size:0.9rem;padding:4px 0;color:var(--text-secondary);"></div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <button class="btn btn-danger" onclick="showRsvCancelConfirm()">この予約をキャンセル</button>
+    </div>
+    <div id="rsvCancelConfirm" class="delete-confirm" style="display:none">
+      <p>本当にキャンセルしますか？お客様にキャンセル通知が送信されます。</p>
+      <div class="form-group" style="margin-top:8px;">
+        <input class="input-field" type="text" id="rsvCancelReason" placeholder="キャンセル理由（例: 体調不良のため）">
+      </div>
+      <div class="btns">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="hideRsvCancelConfirm()">戻る</button>
+        <button class="btn btn-danger btn-sm" style="flex:1;" onclick="doRsvCancel()">キャンセル実行</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-outline" style="flex:1;" onclick="closeRsvEdit()">戻る</button>
+    <button class="btn btn-success" style="flex:2;" onclick="saveRsvChanges()">💾 変更を保存・通知</button>
   </div>
 </div>
 
@@ -821,6 +923,201 @@ function showToast(msg, type){
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); },400); }, 2500);
+}
+
+// ── Tab switching ──
+var currentTab = 'menu';
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabMenu').classList.toggle('active', tab === 'menu');
+  document.getElementById('tabRsv').classList.toggle('active', tab === 'rsv');
+  document.getElementById('tabMenuContent').style.display = tab === 'menu' ? 'block' : 'none';
+  document.getElementById('tabRsvContent').style.display = tab === 'rsv' ? 'block' : 'none';
+  document.getElementById('fabMenu').style.display = tab === 'menu' ? 'flex' : 'none';
+  if (tab === 'rsv' && reservations.length === 0) loadReservations();
+}
+
+// ── Reservation Management ──
+var reservations = [];
+var editingRsv = null;
+var rsvFilter = 'upcoming';
+
+function loadReservations() {
+  showLoading();
+  apiGet({ action: 'getReservations' }).then(function(res) {
+    hideLoading();
+    if (res.success) {
+      reservations = res.data.reservations;
+      renderRsvList();
+    } else {
+      showToast(res.error || '予約読み込み失敗', 'error');
+    }
+  }).catch(function() {
+    hideLoading();
+    showToast('通信エラー', 'error');
+  });
+}
+
+function filterRsv(f) {
+  rsvFilter = f;
+  document.querySelectorAll('.rsv-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  var btnId = { upcoming: 'filterUpcoming', past: 'filterPast', cancelled: 'filterCancelled', all: 'filterAll' };
+  document.getElementById(btnId[f]).classList.add('active');
+  renderRsvList();
+}
+
+function renderRsvList() {
+  var container = document.getElementById('rsvListContainer');
+  container.innerHTML = '';
+  var today = new Date();
+  var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+  var filtered = reservations.filter(function(r) {
+    var status = (r['ステータス'] || '').toString();
+    var dateStr = (r['予約日'] || '').toString();
+    if (rsvFilter === 'upcoming') return status !== 'キャンセル' && dateStr >= todayStr;
+    if (rsvFilter === 'past') return status !== 'キャンセル' && dateStr < todayStr;
+    if (rsvFilter === 'cancelled') return status === 'キャンセル';
+    return true; // all
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📅</div><div class="title">予約がありません</div></div>';
+    return;
+  }
+
+  filtered.forEach(function(r) {
+    var isCancelled = (r['ステータス'] || '') === 'キャンセル';
+    var el = document.createElement('div');
+    el.className = 'rsv-item' + (isCancelled ? ' cancelled' : '');
+
+    var badge = isCancelled
+      ? '<span class="rsv-badge rsv-badge-cancel">キャンセル</span>'
+      : '<span class="rsv-badge rsv-badge-ok">確定</span>';
+
+    var phone = r['電話番号'] || '';
+    var email = r['メールアドレス'] || '';
+    var contactParts = [];
+    if (phone) contactParts.push('📞 ' + phone);
+    if (email) contactParts.push('✉ ' + email);
+
+    el.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div class="rsv-date">📅 ' + (r['予約日'] || '') + ' ' + (r['予約時間'] || '') + '</div>' +
+        badge +
+      '</div>' +
+      '<div class="rsv-name">' + (r['お名前'] || '名前なし') + '</div>' +
+      '<div class="rsv-detail">' + (r['メニュー'] || '') + '</div>' +
+      '<div class="rsv-detail">¥' + ((r['合計金額'] || 0).toLocaleString ? (r['合計金額'] || 0).toLocaleString() : r['合計金額']) + ' / ' + (r['所要時間'] || '') + '分</div>' +
+      '<div class="rsv-contact">' + contactParts.join(' ｜ ') + '</div>';
+
+    if (!isCancelled) {
+      el.style.cursor = 'pointer';
+      el.onclick = function() { openRsvEdit(r); };
+    }
+    container.appendChild(el);
+  });
+}
+
+function openRsvEdit(r) {
+  editingRsv = r;
+  document.getElementById('rsvEditTitle').textContent = '予約詳細';
+  document.getElementById('rsvCustName').textContent = (r['お名前'] || '') + '様';
+
+  var phone = r['電話番号'] || '';
+  var email = r['メールアドレス'] || '';
+  var uid = r['LINE_UID'] || '';
+  var contacts = [];
+  if (phone) contacts.push('📞 ' + phone);
+  if (email) contacts.push('✉ ' + email);
+  if (uid) contacts.push('💬 LINE連携済み');
+  document.getElementById('rsvCustContact').innerHTML = contacts.join('<br>');
+
+  // Date
+  var dateStr = (r['予約日'] || '').toString();
+  if (dateStr) {
+    // Convert YYYY/MM/DD or YYYY-MM-DD to input format
+    document.getElementById('rsvEditDate').value = dateStr.replace(/\//g, '-');
+  }
+  // Time
+  document.getElementById('rsvEditTime').value = r['予約時間'] || '';
+  document.getElementById('rsvEditMenu').value = r['メニュー'] || '';
+  document.getElementById('rsvEditPrice').textContent = '¥' + ((r['合計金額'] || 0).toLocaleString ? (r['合計金額'] || 0).toLocaleString() : r['合計金額']);
+
+  document.getElementById('rsvCancelConfirm').style.display = 'none';
+  document.getElementById('rsvEditPanel').classList.add('open');
+  document.body.classList.add('no-scroll');
+}
+
+function closeRsvEdit() {
+  document.getElementById('rsvEditPanel').classList.remove('open');
+  document.body.classList.remove('no-scroll');
+  editingRsv = null;
+}
+
+function showRsvCancelConfirm() { document.getElementById('rsvCancelConfirm').style.display = 'block'; }
+function hideRsvCancelConfirm() { document.getElementById('rsvCancelConfirm').style.display = 'none'; }
+
+function doRsvCancel() {
+  if (!editingRsv) return;
+  var reason = document.getElementById('rsvCancelReason').value.trim() || '管理者によるキャンセル';
+  showLoading();
+  apiPost({
+    action: 'cancelReservation',
+    password: 'yorunail2026',
+    rowNumber: editingRsv._row,
+    reason: reason
+  }).then(function(res) {
+    hideLoading();
+    if (res.success) {
+      showToast('キャンセルしました。お客様に通知を送信しました。', 'success');
+      closeRsvEdit();
+      loadReservations();
+    } else {
+      showToast('キャンセル失敗: ' + (res.error || ''), 'error');
+    }
+  }).catch(function() {
+    hideLoading();
+    showToast('通信エラー', 'error');
+  });
+}
+
+function saveRsvChanges() {
+  if (!editingRsv) return;
+  var newDate = document.getElementById('rsvEditDate').value;
+  var newTime = document.getElementById('rsvEditTime').value;
+  var newMenu = document.getElementById('rsvEditMenu').value;
+
+  var updates = {};
+  var oldDate = (editingRsv['予約日'] || '').toString().replace(/\//g, '-');
+  if (newDate && newDate !== oldDate) updates.date = newDate;
+  if (newTime && newTime !== editingRsv['予約時間']) updates.time = newTime;
+  if (newMenu && newMenu !== editingRsv['メニュー']) updates.menuLabel = newMenu;
+
+  if (Object.keys(updates).length === 0) {
+    showToast('変更がありません', 'error');
+    return;
+  }
+
+  showLoading();
+  apiPost({
+    action: 'updateReservation',
+    password: 'yorunail2026',
+    rowNumber: editingRsv._row,
+    updates: updates
+  }).then(function(res) {
+    hideLoading();
+    if (res.success) {
+      showToast('変更を保存しました。お客様に通知を送信しました。', 'success');
+      closeRsvEdit();
+      loadReservations();
+    } else {
+      showToast('変更失敗: ' + (res.error || ''), 'error');
+    }
+  }).catch(function() {
+    hideLoading();
+    showToast('通信エラー', 'error');
+  });
 }
 </script>
 </body>
