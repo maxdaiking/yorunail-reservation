@@ -643,6 +643,7 @@ function showDetail(id){
 
   let act='<button class="btn btn-primary" onclick="saveMemo('+r.id+')">メモを保存</button>';
   if(r.status==='confirmed'&&!isPast(r)){
+    act+='<button class="btn btn-warning" onclick="openEditReservation('+r.id+')">予約を編集</button>';
     act+='<button class="btn btn-danger" onclick="confirmCancel('+r.id+')">キャンセルする</button>';
   }
   act+='<button class="btn btn-outline" onclick="closeModal()">閉じる</button>';
@@ -679,6 +680,52 @@ async function updateStatus(id,s){
   closeModal();toast('キャンセルしました');renderHome();renderSchedule();renderList();
 }
 function confirmCancel(id){if(confirm('この予約をキャンセルしますか？\nLINE予約の場合、お客様に通知が送信されます。'))updateStatus(id,'cancelled')}
+
+// ===== EDIT RESERVATION =====
+function openEditReservation(id){
+  const r=reservations.find(x=>x.id===id);if(!r) return;
+  document.getElementById('modalTitle').textContent='予約を編集';
+  document.getElementById('modalBody').innerHTML=
+    '<div class="form-row">'
+    +'<div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="editRDate" value="'+r.date+'"></div>'
+    +'<div class="form-group"><label class="form-label">開始時間</label><select class="form-input" id="editRTime">'+timeOptions(r.time)+'</select></div>'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">施術時間（分）</label>'
+    +'<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem;">'
+    +[30,60,90,120,150,180].map(function(v){return '<button type="button" class="dur-btn'+(v===r.duration?' active':'')+'" onclick="pickDur('+v+',this)">'+v+'</button>'}).join('')
+    +'</div>'
+    +'<input type="number" class="form-input" id="editRDuration" value="'+(r.duration||90)+'" min="15" step="15" style="width:120px;" onchange="syncDurBtns(this.value)">'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">お客様名</label><input type="text" class="form-input" id="editRName" value="'+r.name+'"></div>'
+    +'<div class="form-group"><label class="form-label">メニュー</label><input type="text" class="form-input" id="editRMenu" value="'+r.menu+'"></div>'
+    +'<div class="form-row">'
+    +'<div class="form-group"><label class="form-label">金額（税込）</label><input type="number" class="form-input" id="editRPrice" value="'+(r.price||'')+'" min="0" step="100"></div>'
+    +'<div class="form-group"><label class="form-label">電話番号</label><input type="tel" class="form-input" id="editRPhone" value="'+(r.phone||'')+'"></div>'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">メモ</label><textarea class="form-input form-textarea" id="editRNote" placeholder="お客様情報など">'+(r.note||'')+'</textarea></div>';
+  document.getElementById('modalActions').innerHTML=
+    '<button class="btn btn-primary" onclick="saveEditReservation('+r.id+')">変更を保存</button>'
+    +'<button class="btn btn-outline" onclick="showDetail('+r.id+')">戻る</button>';
+}
+
+async function saveEditReservation(id){
+  const r=reservations.find(x=>x.id===id);if(!r) return;
+  const date=document.getElementById('editRDate').value;
+  const time=document.getElementById('editRTime').value;
+  const duration=parseInt(document.getElementById('editRDuration').value)||90;
+  const name=document.getElementById('editRName').value.trim();
+  const menu=document.getElementById('editRMenu').value.trim();
+  const price=parseInt(document.getElementById('editRPrice').value)||0;
+  const phone=document.getElementById('editRPhone').value.trim();
+  const note=document.getElementById('editRNote').value.trim();
+  if(!date||!time||!name||!menu){toast('日付・時間・名前・メニューは必須です');return}
+  const [hh,mm]=time.split(':').map(Number);
+  const endMin=hh*60+mm+duration;
+  const endTime=(''+(endMin/60|0)).padStart(2,'0')+':'+(''+(endMin%60)).padStart(2,'0');
+  r.date=date;r.time=time;r.endTime=endTime;r.duration=duration;r.name=name;r.menu=menu;r.price=price;r.phone=phone;r.note=note;
+  if(GAS_URL){try{const params=new URLSearchParams({action:'editReservation',token:AUTH_TOKEN,id:String(id),date,time,endTime,duration:String(duration),name,menu,phone,note,price:String(price)});await fetch(GAS_URL+'?'+params.toString())}catch(e){}}
+  closeModal();toast(name+'さんの予約を変更しました');renderHome();renderSchedule();renderList();
+}
 
 // ===== BLOCK =====
 function timeOptions(selected){
@@ -789,7 +836,7 @@ function openAddReservation(date,time){
   document.getElementById('modalOverlay').classList.add('open');
 }
 function pickDur(min,btn){
-  document.getElementById('addDuration').value=min;
+  (document.getElementById('addDuration')||document.getElementById('editRDuration')).value=min;
   document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
