@@ -2,1123 +2,758 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💅</text></svg>">
-<title>メニュー管理 | YoruNail</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>予約管理</title>
 <style>
-:root {
-  --primary: #c97b8b;
-  --primary-dark: #a8596d;
-  --primary-light: #f8e8ed;
-  --primary-pale: #fdf5f7;
-  --bg: #faf7f5;
-  --bg-card: #ffffff;
-  --text: #2d2424;
-  --text-secondary: #6b5a5a;
-  --text-muted: #a89898;
-  --border: #ebe0db;
-  --border-light: #f2ece8;
-  --success: #4ea882;
-  --success-light: #eaf7f0;
-  --error: #d45858;
-  --error-light: #fdeaea;
-  --warning: #d4a04e;
-  --shadow-sm: 0 1px 4px rgba(50,30,30,0.06);
-  --shadow-md: 0 4px 16px rgba(50,30,30,0.08);
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html { font-size:16px; }
-body {
-  font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;
-  background:var(--bg); color:var(--text); line-height:1.7;
-  -webkit-text-size-adjust:100%; padding-bottom:40px;
-}
-body.no-scroll { overflow:hidden; position:fixed; width:100%; }
-html { padding-top:env(safe-area-inset-top); }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#f5f5f7;color:#1d1d1f;line-height:1.6;min-height:100vh;padding-bottom:80px}
 
-/* Header */
-.header {
-  background:linear-gradient(145deg,#d48a9a 0%,#b06578 50%,#9a5268 100%);
-  color:#fff; padding:16px 20px; text-align:center;
-}
-.header h1 { font-size:1.1rem; font-weight:700; }
-.header .sub { font-size:0.75rem; opacity:0.8; margin-top:2px; }
+.auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:linear-gradient(135deg,#06C755 0%,#04a847 100%)}
+.auth-screen h1{color:#fff;font-size:1.5rem;margin-bottom:1.5rem}
+.auth-screen p{color:rgba(255,255,255,.8);font-size:.9rem;text-align:center}
+.auth-error{color:#ffe0e0;font-weight:600;margin-top:1rem;display:none}
 
-/* Login */
-.login-wrap {
-  max-width:400px; margin:60px auto; padding:0 20px;
-}
-.login-card {
-  background:var(--bg-card); border-radius:16px; padding:32px 24px;
-  box-shadow:var(--shadow-md); text-align:center;
-}
-.login-card h2 { font-size:1rem; margin-bottom:20px; color:var(--primary-dark); }
-.login-card .icon { font-size:48px; margin-bottom:16px; }
-.input-field {
-  width:100%; padding:14px 16px; border:2px solid var(--border);
-  border-radius:10px; font-size:1rem; font-family:inherit;
-  outline:none; transition:border-color 0.2s; background:#fff;
-}
-.input-field:focus { border-color:var(--primary); }
-.btn {
-  display:inline-flex; align-items:center; justify-content:center; gap:6px;
-  padding:14px 24px; border:none; border-radius:12px;
-  font-size:0.95rem; font-weight:700; font-family:inherit;
-  cursor:pointer; transition:all 0.2s; width:100%;
-}
-.btn:active { transform:scale(0.97); }
-.btn-primary {
-  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-  color:#fff; box-shadow:0 4px 12px rgba(168,89,109,0.3);
-}
-.btn-success {
-  background:linear-gradient(135deg,var(--success),#3d9070);
-  color:#fff;
-}
-.btn-outline {
-  background:#fff; color:var(--primary-dark);
-  border:2px solid var(--primary);
-}
-.btn-danger {
-  background:var(--error); color:#fff;
-}
-.btn-sm { padding:10px 16px; font-size:0.85rem; }
-.error-msg { color:var(--error); font-size:0.85rem; margin-top:8px; }
+.header{background:#fff;border-bottom:1px solid #e5e5ea;padding:.8rem 1rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:1.1rem;font-weight:700}
+.salon-name{font-size:.75rem;color:#86868b}
 
-/* Container */
-.container { max-width:480px; margin:0 auto; padding:12px 16px; }
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e5ea;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:.6rem 0 .4rem;border:none;background:none;color:#86868b;font-size:.65rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s;min-height:56px}
+.nav-item.active{color:#06C755}
+.nav-item svg{width:26px;height:26px;margin-bottom:2px}
 
-/* Menu list */
-.menu-item {
-  background:var(--bg-card); border-radius:14px; padding:12px;
-  margin-bottom:12px; box-shadow:var(--shadow-sm);
-  border:1px solid var(--border-light);
-  display:flex; align-items:center; gap:12px;
-  cursor:pointer; transition:all 0.2s;
-}
-.menu-item:active { transform:scale(0.98); background:var(--primary-pale); }
-.menu-item.disabled { opacity:0.5; }
-.menu-thumb {
-  width:64px; height:64px; border-radius:10px;
-  object-fit:cover; background:var(--border-light);
-  flex-shrink:0; display:flex; align-items:center; justify-content:center;
-  font-size:24px; color:var(--text-muted); overflow:hidden;
-}
-.menu-thumb img { width:100%; height:100%; object-fit:cover; }
-.menu-info { flex:1; min-width:0; }
-.menu-name { font-size:0.9rem; font-weight:700; }
-.menu-meta { font-size:0.78rem; color:var(--text-secondary); margin-top:2px; }
-.menu-badge {
-  display:inline-block; padding:2px 8px; border-radius:20px;
-  font-size:0.65rem; font-weight:700; margin-top:4px;
-}
-.badge-on { background:var(--success-light); color:var(--success); }
-.badge-off { background:var(--error-light); color:var(--error); }
-.badge-popular { background:var(--primary-light); color:var(--primary-dark); }
-.menu-arrow { color:var(--text-muted); font-size:1.2rem; flex-shrink:0; }
+.page{display:none;padding:1rem}.page.active{display:block}
+.section-title{font-size:.8rem;font-weight:700;color:#86868b;letter-spacing:.5px;margin:1.2rem 0 .6rem}
 
-/* Category header */
-.cat-header {
-  font-size:0.85rem; font-weight:700; color:var(--primary-dark);
-  padding:12px 4px 6px; display:flex; align-items:center; gap:8px;
-}
-.cat-header .cat-icon {
-  width:28px; height:28px; border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px;
-}
-.cat-icon.pink { background:var(--primary-light); }
-.cat-icon.amber { background:#fef3e2; }
-.cat-icon.blue { background:#e8f0fd; }
-.cat-icon.green { background:var(--success-light); }
+.today-card{background:linear-gradient(135deg,#06C755 0%,#04a847 100%);color:#fff;border-radius:16px;padding:1.2rem;margin-bottom:1rem}
+.today-card .date{font-size:.85rem;opacity:.9}
+.today-card .count{font-size:2.5rem;font-weight:800;line-height:1.2}
+.today-card .label{font-size:.85rem;opacity:.9}
+.today-stats{display:flex;gap:.6rem;margin-top:.8rem}
+.today-stat{flex:1;background:rgba(255,255,255,.2);border-radius:10px;padding:.5rem;text-align:center}
+.today-stat .num{font-size:1.3rem;font-weight:700}
+.today-stat .lbl{font-size:.7rem;opacity:.85}
 
-/* Edit form */
-.edit-panel {
-  position:fixed; inset:0; z-index:200;
-  background:var(--bg); overflow-y:auto;
-  transform:translateX(100%); transition:transform 0.3s ease;
-}
-.edit-panel.open { transform:translateX(0); }
-.edit-header {
-  background:var(--bg-card); padding:14px 16px;
-  border-bottom:1px solid var(--border-light);
-  display:flex; align-items:center; gap:12px;
-  position:sticky; top:0; z-index:10;
-}
-.edit-header h2 { font-size:1rem; font-weight:700; flex:1; }
-.edit-body { padding:16px; max-width:480px; margin:0 auto; }
-.form-group { margin-bottom:18px; }
-.form-label {
-  display:block; font-size:0.85rem; font-weight:700;
-  margin-bottom:6px; color:var(--text-secondary);
-}
-.form-hint { font-size:0.75rem; color:var(--text-muted); margin-top:4px; }
+.res-card{background:#fff;border-radius:14px;padding:1rem 1.1rem;margin-bottom:.6rem;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:.8rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.res-card:active{transform:scale(.98)}
+.res-time{min-width:52px;text-align:center}
+.res-time .time{font-size:1rem;font-weight:700;color:#06C755}
+.res-time .dur{font-size:.65rem;color:#86868b}
+.res-info{flex:1;min-width:0}
+.res-name{font-size:1rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-menu{font-size:.8rem;color:#86868b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-status{padding:.25rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600;white-space:nowrap}
+.status-confirmed{background:#e8f5e9;color:#2e7d32}
+.status-visited{background:#e3f2fd;color:#1565c0}
+.status-cancelled{background:#fce4ec;color:#c62828}
+.status-manual{background:#fff3e0;color:#e65100}
 
-/* Photo upload */
-.photo-upload-area {
-  width:100%; aspect-ratio:1/1; border:2px dashed var(--border);
-  border-radius:14px; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:8px;
-  cursor:pointer; transition:all 0.2s; overflow:hidden;
-  position:relative; background:var(--bg-card);
-}
-.photo-upload-area:active { border-color:var(--primary); background:var(--primary-pale); }
-.photo-upload-area img {
-  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-}
-.photo-upload-area .overlay {
-  position:absolute; inset:0; background:rgba(0,0,0,0.4);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  color:#fff; gap:4px; opacity:0; transition:opacity 0.2s;
-}
-.photo-upload-area:active .overlay { opacity:1; }
-.photo-upload-area .placeholder { color:var(--text-muted); text-align:center; }
-.photo-upload-area .placeholder .icon { font-size:36px; }
-.photo-upload-area .placeholder .text { font-size:0.85rem; font-weight:600; }
+/* ===== SCHEDULE ===== */
+.schedule-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.schedule-date{font-size:1.1rem;font-weight:700}
+.date-nav-btn{width:48px;height:48px;border-radius:50%;border:1px solid #e5e5ea;background:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.date-nav-btn:active{background:#f0f0f0}
+.today-btn{background:#06C755;color:#fff;border:none;border-radius:8px;padding:.4rem .8rem;font-size:.8rem;font-weight:600;cursor:pointer}
+.holiday-banner{background:#fce4ec;border-radius:10px;padding:.8rem 1rem;margin-bottom:.8rem;font-size:.9rem;color:#c62828;font-weight:600;text-align:center}
 
-/* Toggle switch */
-.toggle-row {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 0;
-}
-.toggle-label { font-size:0.9rem; font-weight:600; }
-.toggle-switch {
-  width:52px; height:30px; border-radius:15px;
-  background:var(--border); position:relative;
-  cursor:pointer; transition:background 0.2s;
-}
-.toggle-switch.on { background:var(--success); }
-.toggle-switch::after {
-  content:''; position:absolute; top:3px; left:3px;
-  width:24px; height:24px; border-radius:50%;
-  background:#fff; transition:transform 0.2s;
-  box-shadow:0 1px 4px rgba(0,0,0,0.15);
-}
-.toggle-switch.on::after { transform:translateX(22px); }
+.time-grid{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);position:relative}
+.time-row{display:flex;height:48px;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.time-row:active .time-area{background:#f0faf3}
+.time-label{width:50px;flex-shrink:0;font-size:.7rem;font-weight:500;color:#86868b;text-align:right;padding-right:8px;line-height:1;align-self:flex-start;transform:translateY(-50%)}
+.time-label.sub{color:transparent}
+.time-area{flex:1;position:relative;min-height:48px;border-top:1px solid #e8e8ed;margin-left:-6px;padding-left:6px}
+.time-row.half .time-area{border-top:1px dashed #f0f0f2}
+.time-row.now{background:#fffde7}
+.cal-event{position:absolute;left:4px;right:4px;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;cursor:pointer;z-index:2;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.cal-event:active{opacity:.7}
+.cal-event .ev-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-event .ev-menu{font-size:.7rem;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-event.ev-line{background:#06C755;color:#fff;border-left:none}
+.cal-event.ev-manual{background:#ff9800;color:#fff}
+.cal-event.ev-block{background:#e0e0e0;color:#999}
 
-/* Select */
-.select-field {
-  width:100%; padding:14px 16px; border:2px solid var(--border);
-  border-radius:10px; font-size:1rem; font-family:inherit;
-  outline:none; background:#fff; color:var(--text);
-  -webkit-appearance:none; appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a89898' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-  background-repeat:no-repeat; background-position:right 16px center;
-}
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:1.2rem;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:#d1d1d6;border-radius:2px;margin:0 auto 1rem}
+.modal h2{font-size:1.2rem;margin-bottom:.8rem}
+.detail-row{display:flex;padding:.7rem 0;border-bottom:1px solid #f0f0f2}
+.detail-label{width:90px;flex-shrink:0;font-size:.85rem;color:#86868b;font-weight:600}
+.detail-value{font-size:.95rem;flex:1}
 
-/* Floating action */
-.fab {
-  position:fixed; bottom:calc(24px + env(safe-area-inset-bottom)); right:20px;
-  width:56px; height:56px; border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-  color:#fff; border:none; font-size:24px; font-weight:700;
-  box-shadow:0 4px 16px rgba(168,89,109,0.4);
-  cursor:pointer; z-index:100; display:flex;
-  align-items:center; justify-content:center;
-  transition:all 0.2s;
-}
-.fab:active { transform:scale(0.9); }
+/* ===== HISTORY ===== */
+.history-item{display:flex;align-items:center;padding:.6rem 0;border-bottom:1px solid #f0f0f2;font-size:.85rem}
+.history-date{width:80px;flex-shrink:0;color:#86868b;font-weight:600}
+.history-detail{flex:1}
+.history-menu{font-weight:600}
+.history-sub{font-size:.75rem;color:#86868b}
+.history-price{font-weight:700;color:#06C755;white-space:nowrap;margin-left:.5rem}
+.visit-count-badge{display:inline-block;background:#06C755;color:#fff;font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:10px;margin-left:.4rem;vertical-align:middle}
 
-/* Toast */
-.toast {
-  position:fixed; top:16px; left:16px; right:16px;
-  padding:14px 18px; border-radius:14px;
-  font-size:0.85rem; font-weight:600; text-align:center;
-  z-index:9999; transition:opacity 0.3s; opacity:1;
-  box-shadow:var(--shadow-md);
-}
-.toast-success { background:var(--success); color:#fff; }
-.toast-error { background:var(--error); color:#fff; }
+/* ===== FORM ===== */
+.form-group{margin-bottom:.8rem}
+.form-label{display:block;font-size:.8rem;font-weight:600;color:#86868b;margin-bottom:.3rem}
+.form-input{width:100%;padding:.7rem .8rem;border:1px solid #d1d1d6;border-radius:10px;font-size:.95rem;font-family:inherit;background:#fff;-webkit-appearance:none;appearance:none}
+.form-input:focus{outline:none;border-color:#06C755;box-shadow:0 0 0 3px rgba(6,199,85,.15)}
+.form-textarea{min-height:70px;resize:vertical}
+.form-row{display:flex;gap:.5rem}
+.form-row .form-group{flex:1}
+.dur-btn{padding:.5rem .9rem;border:1px solid #d1d1d6;border-radius:10px;background:#fff;font-size:.9rem;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dur-btn.active{background:#ff9800;color:#fff;border-color:#ff9800}
+.dur-btn:active{opacity:.7}
 
-/* Loading */
-.loading-overlay {
-  position:fixed; inset:0; background:rgba(250,247,245,0.92);
-  z-index:500; display:none; flex-direction:column;
-  align-items:center; justify-content:center; gap:16px;
-}
-.loading-overlay.show { display:flex; }
-.spinner {
-  width:36px; height:36px; border:3px solid var(--border);
-  border-top-color:var(--primary); border-radius:50%;
-  animation:spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
+/* ===== BUTTONS ===== */
+.btn{display:block;width:100%;padding:1rem;border:none;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;transition:opacity .2s;margin-top:.6rem}
+.btn:active{opacity:.7}
+.btn-primary{background:#06C755;color:#fff}
+.btn-danger{background:#ff3b30;color:#fff}
+.btn-outline{background:#fff;color:#1d1d1f;border:1px solid #d1d1d6}
+.btn-warning{background:#ff9800;color:#fff}
 
-/* Action bar */
-.action-bar {
-  position:fixed; bottom:0; left:0; right:0;
-  background:var(--bg-card); padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-  border-top:1px solid var(--border-light);
-  box-shadow:0 -4px 16px rgba(50,30,30,0.08);
-  z-index:50; display:flex; gap:10px;
-  max-width:480px; margin:0 auto;
-}
+/* ===== SETTINGS ===== */
+.setting-group{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.setting-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem;border-bottom:1px solid #f0f0f2;min-height:56px}
+.setting-item:last-child{border-bottom:none}
+.setting-label{font-size:.95rem}
+.setting-value{font-size:.95rem;color:#86868b;text-align:right;max-width:55%}
 
-/* Empty state */
-.empty-state {
-  text-align:center; padding:48px 20px;
-  color:var(--text-muted);
-}
-.empty-state .icon { font-size:48px; margin-bottom:12px; }
-.empty-state .title { font-size:1rem; font-weight:700; color:var(--text-secondary); margin-bottom:4px; }
-.empty-state .desc { font-size:0.85rem; }
+.holiday-item{background:#fff;border-radius:14px;padding:.8rem 1rem;margin-bottom:.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between}
+.holiday-info{flex:1}
+.holiday-date{font-weight:600;font-size:.9rem}
+.holiday-reason{font-size:.8rem;color:#86868b}
+.delete-btn{width:40px;height:40px;border-radius:50%;border:none;background:#fce4ec;color:#c62828;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-/* Pull-to-refresh hint */
-.refresh-hint {
-  text-align:center; padding:12px; font-size:0.75rem; color:var(--text-muted);
-  cursor:pointer;
-}
-.refresh-hint:active { color:var(--primary); }
+.empty-state{text-align:center;padding:3rem 1rem;color:#86868b}
+.empty-state svg{width:64px;height:64px;opacity:.3;margin-bottom:1rem}
+.empty-state p{font-size:1rem}
+.tab-switch{display:flex;background:#e5e5ea;border-radius:10px;padding:3px;margin-bottom:1rem}
+.tab-btn{flex:1;padding:.55rem;border:none;border-radius:8px;background:transparent;font-size:.8rem;font-weight:600;cursor:pointer;color:#86868b;-webkit-tap-highlight-color:transparent;transition:all .2s}
+.tab-btn.active{background:#fff;color:#1d1d1f;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:#fff;padding:.7rem 1.2rem;border-radius:10px;font-size:.85rem;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
 
-/* Delete confirm */
-.delete-confirm {
-  background:var(--error-light); border:2px solid var(--error);
-  border-radius:12px; padding:16px; margin-top:16px; text-align:center;
-}
-.delete-confirm p { font-size:0.9rem; margin-bottom:12px; color:var(--error); font-weight:600; }
-.delete-confirm .btns { display:flex; gap:8px; }
-
-/* Tab bar */
-.tab-bar { display:flex; background:var(--bg-card); border-bottom:2px solid var(--border-light); }
-.tab-btn { flex:1; padding:12px 0; text-align:center; font-size:0.85rem; font-weight:700; color:var(--text-muted); background:none; border:none; cursor:pointer; border-bottom:3px solid transparent; font-family:inherit; }
-.tab-btn.active { color:var(--primary-dark); border-bottom-color:var(--primary); }
-
-/* Reservation list */
-.rsv-item { background:var(--bg-card); border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:var(--shadow-sm); border:1px solid var(--border-light); }
-.rsv-item.cancelled { opacity:0.4; }
-.rsv-date { font-size:0.8rem; font-weight:700; color:var(--primary-dark); }
-.rsv-name { font-size:1rem; font-weight:700; margin-top:2px; }
-.rsv-detail { font-size:0.8rem; color:var(--text-secondary); margin-top:2px; }
-.rsv-contact { font-size:0.75rem; color:var(--text-muted); margin-top:4px; }
-.rsv-actions { display:flex; gap:8px; margin-top:10px; }
-.rsv-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.65rem; font-weight:700; }
-.rsv-badge-ok { background:var(--success-light); color:var(--success); }
-.rsv-badge-cancel { background:var(--error-light); color:var(--error); }
-.rsv-filter-bar { display:flex; gap:8px; padding:8px 0; overflow-x:auto; }
-.rsv-filter-btn { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); font-size:0.75rem; font-weight:600; color:var(--text-secondary); white-space:nowrap; cursor:pointer; font-family:inherit; }
-.rsv-filter-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
-
-/* Edit reservation panel */
-.rsv-edit-panel { position:fixed; inset:0; z-index:200; background:var(--bg); overflow-y:auto; transform:translateX(100%); transition:transform 0.3s ease; }
-.rsv-edit-panel.open { transform:translateX(0); }
-
-/* Logout */
-.logout-bar {
-  text-align:center; padding:24px 16px;
-}
-.logout-btn {
-  background:none; border:1px solid var(--border);
-  padding:8px 20px; border-radius:8px;
-  font-size:0.8rem; color:var(--text-muted);
-  font-family:inherit; cursor:pointer;
-}
+@media(min-width:768px){body{max-width:500px;margin:0 auto;box-shadow:0 0 30px rgba(0,0,0,.1)}.bottom-nav{max-width:500px;left:50%;transform:translateX(-50%)}}
 </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loading" class="loading-overlay">
-  <div class="spinner"></div>
-  <div style="font-size:0.88rem;color:var(--text-secondary);">読み込み中...</div>
+<div id="authScreen" class="auth-screen">
+  <h1>LINE予約システム</h1>
+  <p>管理画面にアクセスしています...</p>
+  <p class="auth-error" id="authError">アクセス権限がありません。<br>正しいURLでアクセスしてください。</p>
 </div>
 
-<!-- Login Screen -->
-<div id="loginScreen">
+<div id="app" style="display:none;">
   <div class="header">
-    <h1>YoruNail 管理画面</h1>
-    <div class="sub">メニュー管理システム</div>
+    <div><h1>予約管理</h1><div class="salon-name" id="salonName">サロン名</div></div>
+    <div style="font-size:.75rem;color:#86868b;" id="headerDate"></div>
   </div>
-  <div class="login-wrap">
-    <div class="login-card">
-      <div class="icon">🔐</div>
-      <h2>スタッフログイン</h2>
-      <div class="form-group">
-        <input class="input-field" type="password" id="loginPass" placeholder="パスワードを入力" autocomplete="current-password">
-      </div>
-      <div id="loginError" class="error-msg" style="display:none"></div>
-      <div style="margin-top:16px;">
-        <button class="btn btn-primary" onclick="doLogin()">ログイン</button>
+
+  <!-- ホーム -->
+  <div class="page active" id="pageHome">
+    <div class="today-card">
+      <div class="date" id="todayDate"></div>
+      <div class="count" id="todayCount">0</div>
+      <div class="label">件の予約</div>
+      <div class="today-stats">
+        <div class="today-stat"><div class="num" id="todayConfirmed">0</div><div class="lbl">確定</div></div>
+        <div class="today-stat"><div class="num" id="todayCancelled">0</div><div class="lbl">キャンセル</div></div>
       </div>
     </div>
+    <div class="section-title">次の予約</div>
+    <div id="nextRes"></div>
+    <div class="section-title">本日の予約</div>
+    <div id="todayList"></div>
+  </div>
+
+  <!-- スケジュール -->
+  <div class="page" id="pageSchedule">
+    <div class="schedule-header">
+      <button class="date-nav-btn" onclick="changeDate(-1)">◀</button>
+      <div style="text-align:center;">
+        <div class="schedule-date" id="scheduleDate"></div>
+        <button class="today-btn" onclick="goToday()">今日</button>
+      </div>
+      <button class="date-nav-btn" onclick="changeDate(1)">▶</button>
+    </div>
+    <div id="holidayBanner"></div>
+    <div class="time-grid" id="timeGrid"></div>
+    <button class="btn btn-outline" style="margin-top:.8rem;" onclick="openHolidayModal()">この日を休業日にする</button>
+  </div>
+
+  <!-- 予約一覧 -->
+  <div class="page" id="pageList">
+    <div class="tab-switch">
+      <button class="tab-btn active" onclick="filterList('all',this)">すべて</button>
+      <button class="tab-btn" onclick="filterList('confirmed',this)">確定</button>
+      <button class="tab-btn" onclick="filterList('cancelled',this)">キャンセル</button>
+    </div>
+    <div id="resList"></div>
+  </div>
+
+  <!-- 設定 -->
+  <div class="page" id="pageSettings">
+    <div class="section-title">サロン情報</div>
+    <div class="setting-group">
+      <div class="setting-item"><span class="setting-label">サロン名</span><span class="setting-value" id="setSalon">-</span></div>
+      <div class="setting-item"><span class="setting-label">営業時間</span><span class="setting-value" id="setHours">-</span></div>
+      <div class="setting-item"><span class="setting-label">定休日</span><span class="setting-value" id="setClosed">-</span></div>
+      <div class="setting-item"><span class="setting-label">同時受付数</span><span class="setting-value" id="setCap">-</span></div>
+      <div class="setting-item"><span class="setting-label">施術間インターバル</span><span class="setting-value" id="setInterval">-</span></div>
+    </div>
+    <div class="section-title">休業日</div>
+    <div id="holidayList"></div>
+    <button class="btn btn-outline" style="margin-top:.3rem;" onclick="openHolidayModal()">＋ 休業日を追加</button>
+    <div class="section-title">連携</div>
+    <div class="setting-group">
+      <div class="setting-item"><span class="setting-label">Googleカレンダー</span><span class="setting-value" id="setCal">-</span></div>
+      <div class="setting-item"><span class="setting-label">予約データ件数</span><span class="setting-value" id="setCount">-</span></div>
+    </div>
+    <div class="section-title">データ管理</div>
+    <div class="setting-group">
+      <div class="setting-item" style="cursor:pointer;" onclick="exportCSV()">
+        <span class="setting-label">予約データをダウンロード</span><span class="setting-value" style="color:#06C755;font-weight:600;">CSV ↓</span>
+      </div>
+    </div>
+    <p style="text-align:center;color:#86868b;font-size:.7rem;margin-top:2rem;">LINE予約システム v2.0<br>合同会社SuzuLabo</p>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="showPage('Home',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>ホーム</button>
+    <button class="nav-item" onclick="showPage('Schedule',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>スケジュール</button>
+    <button class="nav-item" onclick="showPage('List',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>予約一覧</button>
+    <button class="nav-item" onclick="showPage('Settings',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>設定</button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+    <div id="modalActions" style="margin-top:1rem;"></div>
   </div>
 </div>
 
-<!-- Main Screen -->
-<div id="mainScreen" style="display:none">
-  <div class="header">
-    <h1>YoruNail 管理画面</h1>
-    <div class="sub">メニュー・予約を管理できます</div>
-  </div>
-
-  <!-- Tab bar -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('menu')" id="tabMenu">📋 メニュー</button>
-    <button class="tab-btn" onclick="switchTab('rsv')" id="tabRsv">📅 予約</button>
-  </div>
-
-  <!-- Menu tab content (existing) -->
-  <div id="tabMenuContent">
-
-    <div class="refresh-hint" onclick="loadMenus()">タップしてメニューを更新</div>
-    <div class="container" id="menuListContainer">
-      <!-- Populated by JS -->
-    </div>
-  </div>
-
-  <!-- Reservation tab content (new) -->
-  <div id="tabRsvContent" style="display:none">
-    <div class="container">
-      <div class="rsv-filter-bar">
-        <button class="rsv-filter-btn active" onclick="filterRsv('upcoming')" id="filterUpcoming">今後の予約</button>
-        <button class="rsv-filter-btn" onclick="filterRsv('past')" id="filterPast">過去</button>
-        <button class="rsv-filter-btn" onclick="filterRsv('cancelled')" id="filterCancelled">キャンセル</button>
-        <button class="rsv-filter-btn" onclick="filterRsv('all')" id="filterAll">すべて</button>
-      </div>
-      <div id="rsvListContainer">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-  </div>
-
-  <div class="logout-bar">
-    <button class="logout-btn" onclick="doLogout()">ログアウト</button>
-    <div style="margin-top:8px;font-size:10px;color:#ccc;">YoruNail Admin v2.0</div>
-  </div>
-
-  <!-- FAB: Add new menu (only visible on menu tab) -->
-  <button class="fab" id="fabMenu" onclick="openNewMenu()" title="新しいメニューを追加">＋</button>
-</div>
-
-<!-- Edit Panel (slides in from right) -->
-<div id="editPanel" class="edit-panel">
-  <div class="edit-header">
-    <button class="btn btn-outline btn-sm" onclick="closeEdit()" style="width:auto;padding:8px 14px;">✕ 戻る</button>
-    <h2 id="editTitle">メニュー編集</h2>
-  </div>
-  <div class="edit-body" style="padding-bottom:calc(100px + env(safe-area-inset-bottom));">
-
-    <!-- Photo -->
-    <div class="form-group">
-      <label class="form-label">写真</label>
-      <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
-        <div class="placeholder" id="photoPlaceholder">
-          <div class="icon">📷</div>
-          <div class="text">タップして写真を選択</div>
-        </div>
-        <img id="photoPreview" style="display:none">
-        <div class="overlay">
-          <div style="font-size:24px;">📷</div>
-          <div style="font-size:0.85rem;font-weight:600;">写真を変更</div>
-        </div>
-      </div>
-      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
-      <div class="form-hint">推奨: 正方形の写真（1:1）がきれいに表示されます</div>
-    </div>
-
-    <!-- Name -->
-    <div class="form-group">
-      <label class="form-label">メニュー名</label>
-      <input class="input-field" type="text" id="editName" placeholder="例: マオジェル ワンカラー">
-    </div>
-
-    <!-- Price -->
-    <div class="form-group">
-      <label class="form-label">料金（税込）</label>
-      <input class="input-field" type="number" id="editPrice" placeholder="例: 8000" inputmode="numeric">
-      <div class="form-hint">数字のみ入力（¥マーク不要）</div>
-    </div>
-
-    <!-- Duration -->
-    <div class="form-group">
-      <label class="form-label">所要時間（分）</label>
-      <input class="input-field" type="number" id="editMinutes" placeholder="例: 90" inputmode="numeric">
-    </div>
-
-    <!-- Description -->
-    <div class="form-group">
-      <label class="form-label">説明文</label>
-      <input class="input-field" type="text" id="editDesc" placeholder="例: ドライケア込・フィルイン対応">
-    </div>
-
-    <!-- Category -->
-    <div class="form-group">
-      <label class="form-label">カテゴリ</label>
-      <select class="select-field" id="editCategory">
-        <option value="人気メニュー">人気メニュー</option>
-        <option value="マオジェルメニュー">マオジェルメニュー</option>
-        <option value="デザインメニュー">デザインメニュー</option>
-        <option value="オフ">オフ</option>
-      </select>
-    </div>
-
-    <!-- Type -->
-    <div class="form-group">
-      <label class="form-label">タイプ</label>
-      <select class="select-field" id="editType">
-        <option value="main">メイン施術</option>
-        <option value="off">オフ（付け替え）</option>
-      </select>
-    </div>
-
-    <!-- Toggles -->
-    <div class="form-group">
-      <div class="toggle-row">
-        <span class="toggle-label">メニューを表示する</span>
-        <div class="toggle-switch" id="toggleEnabled" onclick="toggleSwitch(this)"></div>
-      </div>
-      <div class="toggle-row">
-        <span class="toggle-label">人気バッジを表示</span>
-        <div class="toggle-switch" id="togglePopular" onclick="toggleSwitch(this)"></div>
-      </div>
-    </div>
-
-    <!-- Sort Order -->
-    <div class="form-group">
-      <label class="form-label">表示順</label>
-      <input class="input-field" type="number" id="editSort" placeholder="1" inputmode="numeric">
-      <div class="form-hint">小さい数字ほど上に表示されます</div>
-    </div>
-
-    <!-- Delete -->
-    <div id="deleteSection" style="margin-top:32px;">
-      <button class="btn btn-outline btn-sm" style="color:var(--error);border-color:var(--error);width:auto;" onclick="showDeleteConfirm()">このメニューを削除</button>
-      <div id="deleteConfirm" class="delete-confirm" style="display:none">
-        <p>本当に削除しますか？この操作は取り消せません。</p>
-        <div class="btns">
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="hideDeleteConfirm()">キャンセル</button>
-          <button class="btn btn-danger btn-sm" style="flex:1;" onclick="doDelete()">削除する</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Save bar -->
-  <div class="action-bar">
-    <button class="btn btn-outline" style="flex:1;" onclick="closeEdit()">キャンセル</button>
-    <button class="btn btn-success" style="flex:2;" onclick="saveMenu()">💾 保存する</button>
+<!-- ACTION SHEET -->
+<div id="actionSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:210;align-items:flex-end;justify-content:center" onclick="closeAS(event)">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:1.2rem;padding-bottom:calc(1.2rem + env(safe-area-inset-bottom,0));animation:slideUp .25s ease" onclick="event.stopPropagation()">
+    <h3 id="asTitle" style="font-size:1rem;font-weight:700;margin-bottom:.2rem;"></h3>
+    <p id="asSub" style="font-size:.8rem;color:#86868b;margin-bottom:1rem;"></p>
+    <button onclick="asToReservation()" style="display:flex;align-items:center;gap:.8rem;width:100%;padding:1rem;border:none;border-radius:14px;background:#fff3e0;font-size:1rem;font-weight:600;cursor:pointer;margin-bottom:.5rem;-webkit-tap-highlight-color:transparent;text-align:left">
+      <span style="width:44px;height:44px;border-radius:12px;background:#ff9800;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">＋</span>
+      <span><span style="display:block;color:#e65100">口頭予約を追加</span><span style="display:block;font-size:.75rem;font-weight:400;color:#86868b">電話・来店などLINE以外の予約</span></span>
+    </button>
+    <button onclick="asToBlock()" style="display:flex;align-items:center;gap:.8rem;width:100%;padding:1rem;border:none;border-radius:14px;background:#f5f5f5;font-size:1rem;font-weight:600;cursor:pointer;margin-bottom:.5rem;-webkit-tap-highlight-color:transparent;text-align:left">
+      <span style="width:44px;height:44px;border-radius:12px;background:#bbb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">✕</span>
+      <span><span style="display:block;color:#666">受付不可にする</span><span style="display:block;font-size:.75rem;font-weight:400;color:#86868b">休憩・私用などでこの時間を閉じる</span></span>
+    </button>
+    <button onclick="closeAS()" style="width:100%;padding:.8rem;border:1px solid #e5e5ea;border-radius:14px;background:#fff;font-size:.9rem;color:#86868b;cursor:pointer;margin-top:.3rem">キャンセル</button>
   </div>
 </div>
 
-<!-- Reservation Edit Panel -->
-<div id="rsvEditPanel" class="rsv-edit-panel">
-  <div class="edit-header">
-    <button class="btn btn-outline btn-sm" onclick="closeRsvEdit()" style="width:auto;padding:8px 14px;">✕ 戻る</button>
-    <h2 id="rsvEditTitle">予約詳細</h2>
-  </div>
-  <div class="edit-body" style="padding-bottom:calc(100px + env(safe-area-inset-bottom));">
-    <div class="form-group">
-      <label class="form-label">お客様名</label>
-      <div id="rsvCustName" style="font-size:1.1rem;font-weight:700;padding:8px 0;"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">連絡先</label>
-      <div id="rsvCustContact" style="font-size:0.85rem;padding:4px 0;"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">予約日</label>
-      <input class="input-field" type="date" id="rsvEditDate">
-    </div>
-    <div class="form-group">
-      <label class="form-label">予約時間</label>
-      <input class="input-field" type="time" id="rsvEditTime">
-    </div>
-    <div class="form-group">
-      <label class="form-label">メニュー</label>
-      <input class="input-field" type="text" id="rsvEditMenu">
-    </div>
-    <div class="form-group">
-      <label class="form-label">料金</label>
-      <div id="rsvEditPrice" style="font-size:0.9rem;padding:4px 0;color:var(--text-secondary);"></div>
-    </div>
-
-    <div style="margin-top:24px;">
-      <button class="btn btn-danger" onclick="showRsvCancelConfirm()">この予約をキャンセル</button>
-    </div>
-    <div id="rsvCancelConfirm" class="delete-confirm" style="display:none">
-      <p>本当にキャンセルしますか？お客様にキャンセル通知が送信されます。</p>
-      <div class="form-group" style="margin-top:8px;">
-        <input class="input-field" type="text" id="rsvCancelReason" placeholder="キャンセル理由（例: 体調不良のため）">
-      </div>
-      <div class="btns">
-        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="hideRsvCancelConfirm()">戻る</button>
-        <button class="btn btn-danger btn-sm" style="flex:1;" onclick="doRsvCancel()">キャンセル実行</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="action-bar">
-    <button class="btn btn-outline" style="flex:1;" onclick="closeRsvEdit()">戻る</button>
-    <button class="btn btn-success" style="flex:2;" onclick="saveRsvChanges()">💾 変更を保存・通知</button>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-'use strict';
+const GAS_URL='';
+let AUTH_TOKEN='';
+let viewDate=new Date();
+let reservations=[];
+let blocks=[];
+let holidays=[];
+let settings={};
+let currentFilter='all';
+let nextId=100;
+let nextBlockId=100;
 
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbwI9uvlhv6pFP6HyxwSKB5PBRV52rWz5eCo9kctBhYcR8RqD3uNOvaRJ53j3AZ5Nhno/exec';
-
-var menus = [];
-var editingMenu = null; // current menu being edited
-var newPhotoData = null; // base64 of new photo
-var newPhotoMime = null;
-var isNewMenu = false;
-
-// ── Login ──
-function doLogin(){
-  var pass = document.getElementById('loginPass').value;
-  if(!pass){ showLoginError('パスワードを入力してください'); return; }
-  showLoading();
-  apiPost({action:'adminLogin', password:pass}).then(function(res){
-    hideLoading();
-    if(res.success){
-      sessionStorage.setItem('yn_admin','1');
-      document.getElementById('loginScreen').style.display='none';
-      document.getElementById('mainScreen').style.display='block';
-      loadMenus();
-    } else {
-      showLoginError(res.error || 'ログインに失敗しました');
-    }
-  }).catch(function(){
-    hideLoading();
-    showLoginError('通信エラーが発生しました');
-  });
+function init(){
+  const p=new URLSearchParams(location.search);
+  AUTH_TOKEN=p.get('token');
+  if(!GAS_URL){loadDemo();return}
+  if(!AUTH_TOKEN){document.getElementById('authError').style.display='block';return}
+  fetchData();
 }
 
-function showLoginError(msg){
-  var el = document.getElementById('loginError');
-  el.textContent = msg;
-  el.style.display = 'block';
+function loadDemo(){
+  const today=fmtDate(new Date());
+  const tmr=fmtDate(new Date(Date.now()+864e5));
+  const day3=fmtDate(new Date(Date.now()+864e5*3));
+  const past1=fmtDate(new Date(Date.now()-864e5*7));
+  const past2=fmtDate(new Date(Date.now()-864e5*21));
+  const past3=fmtDate(new Date(Date.now()-864e5*45));
+  settings={salonName:'デモサロン',openTime:'10:00',closeTime:'20:00',closedDays:'火,水',capacity:1,interval:0,calendarId:''};
+  reservations=[
+    {id:1,date:today,time:'10:00',endTime:'11:00',name:'田中 花子',menu:'ジェルネイル（ワンカラー）',duration:60,status:'confirmed',source:'line',phone:'090-1234-5678',lineUid:'U1234',note:'',customerMemo:'常連のお客様。ラメ系が好み。',price:6000},
+    {id:2,date:today,time:'11:30',endTime:'13:00',name:'佐藤 美咲',menu:'ジェルネイル（アート）',duration:90,status:'confirmed',source:'line',phone:'080-2345-6789',lineUid:'U2345',note:'初めてのお客様',customerMemo:'',price:8500},
+    {id:3,date:today,time:'14:00',endTime:'15:00',name:'鈴木 由美子',menu:'ハンドケア＋マニキュア',duration:60,status:'cancelled',source:'line',phone:'070-3456-7890',lineUid:'U3456',note:'体調不良',customerMemo:'爪が薄めなので注意',price:5000},
+    {id:4,date:today,time:'16:00',endTime:'17:30',name:'高橋 恵',menu:'フットジェル',duration:90,status:'confirmed',source:'manual',phone:'090-4567-8901',lineUid:'',note:'電話予約',customerMemo:'',price:7500},
+    {id:5,date:tmr,time:'10:00',endTime:'11:30',name:'山本 里奈',menu:'ジェルオフ＋ワンカラー',duration:90,status:'confirmed',source:'line',phone:'080-5678-9012',lineUid:'U5678',note:'',customerMemo:'',price:7000},
+    {id:6,date:tmr,time:'13:00',endTime:'14:00',name:'中村 久美子',menu:'ハンドケア',duration:60,status:'confirmed',source:'line',phone:'070-6789-0123',lineUid:'U6789',note:'',customerMemo:'アレルギーあり（ラテックス）',price:4000},
+    // 田中花子の過去来店
+    {id:7,date:past1,time:'10:00',endTime:'11:00',name:'田中 花子',menu:'ジェルネイル（ラメグラデ）',duration:60,status:'confirmed',source:'line',phone:'090-1234-5678',lineUid:'U1234',note:'',customerMemo:'',price:7000},
+    {id:8,date:past2,time:'11:00',endTime:'12:30',name:'田中 花子',menu:'ジェルネイル（アート）',duration:90,status:'confirmed',source:'line',phone:'090-1234-5678',lineUid:'U1234',note:'',customerMemo:'',price:8500},
+    {id:9,date:past3,time:'10:00',endTime:'11:00',name:'田中 花子',menu:'ジェルオフ＋ワンカラー',duration:60,status:'confirmed',source:'line',phone:'090-1234-5678',lineUid:'U1234',note:'',customerMemo:'',price:6500},
+  ];
+  blocks=[{id:1,date:today,startTime:'13:00',endTime:'14:00',reason:'昼休憩'}];
+  holidays=[{date:day3,reason:'研修のため'}];
+  showApp();
 }
 
-function doLogout(){
-  sessionStorage.removeItem('yn_admin');
-  location.reload();
+async function fetchData(){
+  try{
+    const r=await fetch(GAS_URL+'?action=getAll&token='+AUTH_TOKEN);
+    const d=await r.json();
+    if(d.error==='unauthorized'){document.getElementById('authError').style.display='block';return}
+    settings=d.settings;reservations=d.reservations;
+    blocks=d.blocks||[];holidays=d.holidays||[];
+    showApp();
+  }catch(e){loadDemo()}
 }
 
-// ── Auto-login check ──
-window.addEventListener('DOMContentLoaded', function(){
-  if(sessionStorage.getItem('yn_admin') === '1'){
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('mainScreen').style.display='block';
-    loadMenus();
-  }
-  // Enter key for login
-  document.getElementById('loginPass').addEventListener('keydown', function(e){
-    if(e.key === 'Enter') doLogin();
-  });
-});
-
-// ── Load Menus ──
-function loadMenus(){
-  showLoading();
-  apiGet({action:'getMenus'}).then(function(res){
-    hideLoading();
-    if(res.success){
-      menus = res.data.menus;
-      menus.sort(function(a,b){ return (a.sortOrder||99) - (b.sortOrder||99); });
-      renderMenuList();
-    } else {
-      showToast(res.error || 'メニュー読み込み失敗', 'error');
-    }
-  }).catch(function(){
-    hideLoading();
-    showToast('通信エラー', 'error');
-  });
+function showApp(){
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('salonName').textContent=settings.salonName;
+  document.getElementById('setSalon').textContent=settings.salonName;
+  document.getElementById('setHours').textContent=settings.openTime+'〜'+settings.closeTime;
+  document.getElementById('setClosed').textContent=settings.closedDays||'なし';
+  document.getElementById('setCap').textContent=settings.capacity+'名';
+  document.getElementById('setInterval').textContent=(settings.interval||30)+'分';
+  document.getElementById('setCal').textContent=settings.calendarId?'連携中':'未連携';
+  document.getElementById('setCount').textContent=reservations.length+'件';
+  renderHome();renderSchedule();renderList();renderHolidayList();
 }
 
-function renderMenuList(){
-  var container = document.getElementById('menuListContainer');
-  container.innerHTML = '';
-  if(!menus || menus.length === 0){
-    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="title">メニューがありません</div><div class="desc">右下の＋ボタンから追加してください</div></div>';
-    return;
-  }
-  var categories = {};
-  var catOrder = ['人気メニュー','マオジェルメニュー','デザインメニュー','オフ'];
-  var catIcons = {'人気メニュー':'💅','マオジェルメニュー':'✨','デザインメニュー':'🎨','オフ':'🔄'};
-  var catColors = {'人気メニュー':'pink','マオジェルメニュー':'amber','デザインメニュー':'blue','オフ':'green'};
+// ===== HOME =====
+function renderHome(){
+  const today=fmtDate(new Date()),todayRes=reservations.filter(r=>r.date===today),now=new Date();
+  const wd=['日','月','火','水','木','金','土'];
+  document.getElementById('todayDate').textContent=(now.getMonth()+1)+'月'+now.getDate()+'日（'+wd[now.getDay()]+'）';
+  document.getElementById('headerDate').textContent=now.getFullYear()+'/'+(''+(now.getMonth()+1)).padStart(2,'0')+'/'+(''+ now.getDate()).padStart(2,'0');
+  const conf=todayRes.filter(r=>r.status==='confirmed').length;
+  document.getElementById('todayCount').textContent=conf;
+  document.getElementById('todayConfirmed').textContent=conf;
+  document.getElementById('todayCancelled').textContent=todayRes.filter(r=>r.status==='cancelled').length;
 
-  menus.forEach(function(m){
-    var cat = m.category || 'その他';
-    if(!categories[cat]) categories[cat] = [];
-    categories[cat].push(m);
-  });
+  const nowTime=(''+ now.getHours()).padStart(2,'0')+':'+(''+ now.getMinutes()).padStart(2,'0');
+  const upcoming=todayRes.filter(r=>r.status==='confirmed'&&r.time>=nowTime).sort((a,b)=>a.time.localeCompare(b.time));
+  const nextEl=document.getElementById('nextRes');
+  if(upcoming.length>0){
+    const u=upcoming[0];
+    nextEl.innerHTML='<div style="background:#fff3e0;border-radius:14px;padding:1rem;margin-bottom:.6rem;border-left:4px solid #ff9800;cursor:pointer;" onclick="showDetail('+u.id+')">'
+      +'<div style="font-size:.8rem;color:#e65100;font-weight:700;margin-bottom:.3rem;">次のお客様'+(u.source==='manual'?' (口頭)':'')+'</div>'
+      +'<div style="font-size:1.1rem;font-weight:700;">'+u.time+' '+u.name+'</div>'
+      +'<div style="font-size:.85rem;color:#666;">'+u.menu+'（'+u.duration+'分）</div>'
+      +(u.customerMemo?'<div style="font-size:.8rem;color:#e65100;margin-top:.4rem;">メモ: '+u.customerMemo+'</div>':'')
+      +'</div>';
+  }else{nextEl.innerHTML=''}
 
-  catOrder.forEach(function(cat){
-    var items = categories[cat];
-    if(!items || !items.length) return;
-
-    var header = document.createElement('div');
-    header.className = 'cat-header';
-    header.innerHTML = '<div class="cat-icon '+(catColors[cat]||'pink')+'">'+
-      (catIcons[cat]||'📋')+'</div><span>'+cat+' ('+items.length+')</span>';
-    container.appendChild(header);
-
-    items.forEach(function(m){
-      var el = document.createElement('div');
-      el.className = 'menu-item' + (m.enabled ? '' : ' disabled');
-      var thumbHtml = '';
-      if(m.imageUrl){
-        thumbHtml = '<div class="menu-thumb"><img src="'+m.imageUrl+'" onerror="this.parentElement.innerHTML=\'📷\'"></div>';
-      } else {
-        thumbHtml = '<div class="menu-thumb">📷</div>';
-      }
-      var badges = '';
-      if(m.enabled){
-        badges += '<span class="menu-badge badge-on">表示中</span> ';
-      } else {
-        badges += '<span class="menu-badge badge-off">非表示</span> ';
-      }
-      if(m.popular){
-        badges += '<span class="menu-badge badge-popular">人気</span>';
-      }
-
-      el.innerHTML = thumbHtml +
-        '<div class="menu-info">' +
-          '<div class="menu-name">'+m.label+'</div>' +
-          '<div class="menu-meta">¥'+(m.price||0).toLocaleString()+' / '+(m.minutes||0)+'分</div>' +
-          '<div>'+badges+'</div>' +
-        '</div>' +
-        '<div class="menu-arrow">▶</div>';
-      el.onclick = function(){ openEdit(m); };
-      container.appendChild(el);
-    });
-  });
+  const active=todayRes.filter(r=>r.status!=='cancelled').sort((a,b)=>a.time.localeCompare(b.time));
+  const listEl=document.getElementById('todayList');
+  if(!active.length){
+    listEl.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p>本日の予約はありません</p></div>';
+  }else{listEl.innerHTML=active.map(r=>resCard(r)).join('')}
 }
 
-// ── Edit Panel ──
-function openEdit(m){
-  editingMenu = m;
-  isNewMenu = false;
-  newPhotoData = null;
-  newPhotoMime = null;
+// ===== SCHEDULE (Googleカレンダー風) =====
+const ROW_H=48; // 30分あたりのpx高さ
+let selectedSlot={date:'',time:'',endTime:''};
 
-  document.getElementById('editTitle').textContent = 'メニュー編集';
-  document.getElementById('editName').value = m.label || '';
-  document.getElementById('editPrice').value = m.price || '';
-  document.getElementById('editMinutes').value = m.minutes || '';
-  document.getElementById('editDesc').value = m.description || '';
-  document.getElementById('editCategory').value = m.category || '人気メニュー';
-  document.getElementById('editType').value = m.type || 'main';
-  document.getElementById('editSort').value = m.sortOrder || '';
+function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m}
+function minToStr(m){return (''+(m/60|0)).padStart(2,'0')+':'+(''+(m%60)).padStart(2,'0')}
 
-  var toggleEnabled = document.getElementById('toggleEnabled');
-  toggleEnabled.classList.toggle('on', !!m.enabled);
-  var togglePopular = document.getElementById('togglePopular');
-  togglePopular.classList.toggle('on', !!m.popular);
+function renderSchedule(){
+  const d=viewDate,wd=['日','月','火','水','木','金','土'];
+  document.getElementById('scheduleDate').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日（'+wd[d.getDay()]+'）';
+  const ds=fmtDate(d);
+  const hol=holidays.find(h=>h.date===ds);
+  document.getElementById('holidayBanner').innerHTML=hol?'<div class="holiday-banner">休業日：'+(hol.reason||'')+'</div>':'';
 
-  // Photo
-  var preview = document.getElementById('photoPreview');
-  var placeholder = document.getElementById('photoPlaceholder');
-  if(m.imageUrl){
-    preview.src = m.imageUrl;
-    preview.style.display = 'block';
-    placeholder.style.display = 'none';
-  } else {
-    preview.style.display = 'none';
-    placeholder.style.display = 'flex';
+  const dayRes=reservations.filter(r=>r.date===ds&&r.status!=='cancelled');
+  const dayBlocks=blocks.filter(b=>b.date===ds);
+  const openH=parseInt(settings.openTime)||10,closeH=parseInt(settings.closeTime)||20;
+  const openMin=openH*60,closeMin=closeH*60;
+  const nowM=new Date().getHours()*60+new Date().getMinutes();
+  const isToday=ds===fmtDate(new Date());
+
+  // 30分刻みの行を生成
+  let html='';
+  for(let m=openMin;m<closeMin;m+=30){
+    const h=m/60|0,mm=m%60;
+    const label=mm===0?(h+':00'):'';
+    const isNow=isToday&&nowM>=m&&nowM<m+30;
+    const timeStr=minToStr(m);
+    html+='<div class="time-row'+(mm===30?' half':'')+(isNow?' now':'')+'" onclick="openAS(\''+ds+'\',\''+timeStr+'\')">'
+      +'<div class="time-label'+(mm===30?' sub':'')+'">'+label+'</div>'
+      +'<div class="time-area"></div></div>';
   }
 
-  document.getElementById('deleteSection').style.display = 'block';
-  hideDeleteConfirm();
-  document.getElementById('editPanel').classList.add('open');
-  document.body.classList.add('no-scroll');
-}
+  // イベント（予約）をabsolute配置
+  let events='';
+  dayRes.forEach(r=>{
+    const top=((toMin(r.time)-openMin)/30)*ROW_H;
+    const height=Math.max((r.duration/30)*ROW_H-4,24);
+    const cls=r.source==='manual'?'ev-manual':'ev-line';
+    events+='<div class="cal-event '+cls+'" style="top:'+top+'px;height:'+height+'px;" onclick="event.stopPropagation();showDetail('+r.id+')">'
+      +'<div class="ev-name">'+r.time+' '+r.name+(r.source==='manual'?' (口頭)':'')+'</div>'
+      +(height>30?'<div class="ev-menu">'+r.menu+'</div>':'')
+      +'</div>';
+  });
+  dayBlocks.forEach(b=>{
+    const top=((toMin(b.startTime)-openMin)/30)*ROW_H;
+    const dur=toMin(b.endTime)-toMin(b.startTime);
+    const height=Math.max((dur/30)*ROW_H-4,24);
+    events+='<div class="cal-event ev-block" style="top:'+top+'px;height:'+height+'px;" onclick="event.stopPropagation();showBlockDetail('+b.id+')">'
+      +'<div class="ev-name">受付不可</div>'
+      +(height>30?'<div class="ev-menu">'+b.reason+'</div>':'')
+      +'</div>';
+  });
 
-function openNewMenu(){
-  editingMenu = {
-    menuId: 'menu_' + Date.now(),
-    label:'', price:0, minutes:90, type:'main',
-    category:'人気メニュー', imageUrl:'', description:'',
-    sortOrder: menus.length + 1, enabled:true, popular:false
-  };
-  isNewMenu = true;
-  newPhotoData = null;
-  newPhotoMime = null;
-
-  document.getElementById('editTitle').textContent = '新規メニュー追加';
-  document.getElementById('editName').value = '';
-  document.getElementById('editPrice').value = '';
-  document.getElementById('editMinutes').value = '90';
-  document.getElementById('editDesc').value = '';
-  document.getElementById('editCategory').value = '人気メニュー';
-  document.getElementById('editType').value = 'main';
-  document.getElementById('editSort').value = editingMenu.sortOrder;
-
-  document.getElementById('toggleEnabled').classList.add('on');
-  document.getElementById('togglePopular').classList.remove('on');
-
-  document.getElementById('photoPreview').style.display = 'none';
-  document.getElementById('photoPlaceholder').style.display = 'flex';
-  document.getElementById('deleteSection').style.display = 'none';
-
-  document.getElementById('editPanel').classList.add('open');
-  document.body.classList.add('no-scroll');
-}
-
-function closeEdit(){
-  document.getElementById('editPanel').classList.remove('open');
-  document.body.classList.remove('no-scroll');
-  editingMenu = null;
-}
-
-// ── Toggle switch ──
-function toggleSwitch(el){
-  el.classList.toggle('on');
-}
-
-// ── Photo selection ──
-function onPhotoSelected(e){
-  var file = e.target.files[0];
-  if(!file) return;
-
-  // Resize image for upload (max 800px)
-  var reader = new FileReader();
-  reader.onload = function(ev){
-    var img = new Image();
-    img.onload = function(){
-      var canvas = document.createElement('canvas');
-      var maxSize = 800;
-      var w = img.width, h = img.height;
-      if(w > maxSize || h > maxSize){
-        if(w > h){ h = Math.round(h * maxSize / w); w = maxSize; }
-        else { w = Math.round(w * maxSize / h); h = maxSize; }
-      }
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      newPhotoData = dataUrl.split(',')[1]; // base64 part
-      newPhotoMime = 'image/jpeg';
-
-      // Show preview
-      document.getElementById('photoPreview').src = dataUrl;
-      document.getElementById('photoPreview').style.display = 'block';
-      document.getElementById('photoPlaceholder').style.display = 'none';
-    };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-// ── Save Menu ──
-function saveMenu(){
-  if(!editingMenu) return;
-  var name = document.getElementById('editName').value.trim();
-  if(!name){ showToast('メニュー名を入力してください','error'); return; }
-
-  var price = parseInt(document.getElementById('editPrice').value) || 0;
-  var minutes = parseInt(document.getElementById('editMinutes').value) || 0;
-  var desc = document.getElementById('editDesc').value.trim();
-  var category = document.getElementById('editCategory').value;
-  var type = document.getElementById('editType').value;
-  var sort = parseInt(document.getElementById('editSort').value) || 1;
-  var enabled = document.getElementById('toggleEnabled').classList.contains('on');
-  var popular = document.getElementById('togglePopular').classList.contains('on');
-
-  showLoading();
-
-  var updates = {
-    label: name,
-    price: price,
-    minutes: minutes,
-    description: desc,
-    category: category,
-    type: type,
-    sortOrder: sort,
-    enabled: enabled,
-    popular: popular
-  };
-
-  // If we have a new photo, upload first (show specific message)
-  var chain = Promise.resolve();
-  if(newPhotoData){
-    showToast('写真をアップロード中...','success');
-    chain = apiPost({
-      action:'uploadImage',
-      menuId: editingMenu.menuId,
-      imageData: newPhotoData,
-      mimeType: newPhotoMime
-    }).then(function(res){
-      if(res.success){
-        updates.imageUrl = res.data.imageUrl;
-      } else {
-        showToast('写真のアップロードに失敗: '+(res.error||''),'error');
-      }
-    });
+  // 現在時刻ライン
+  if(isToday&&nowM>=openMin&&nowM<closeMin){
+    const lineTop=((nowM-openMin)/30)*ROW_H;
+    events+='<div style="position:absolute;top:'+lineTop+'px;left:46px;right:0;height:2px;background:#ff3b30;z-index:3;pointer-events:none"><div style="width:8px;height:8px;border-radius:50%;background:#ff3b30;position:absolute;left:-4px;top:-3px;"></div></div>';
   }
 
-  chain.then(function(){
-    return apiPost({
-      action:'updateMenu',
-      menuId: editingMenu.menuId,
-      isNew: isNewMenu,
-      updates: updates
-    });
-  }).then(function(res){
-    hideLoading();
-    if(res.success){
-      showToast('保存しました！','success');
-      closeEdit();
-      loadMenus(); // Refresh list
-    } else {
-      showToast('保存に失敗: '+(res.error||''),'error');
-    }
-  }).catch(function(err){
-    hideLoading();
-    showToast('通信エラー','error');
-    console.error(err);
+  document.getElementById('timeGrid').innerHTML='<div style="position:relative;">'+html+'<div style="position:absolute;top:0;left:50px;right:0;bottom:0;pointer-events:none;">'+events.replace(/pointer-events:none/g,'pointer-events:auto')+'</div></div>';
+}
+
+// ===== ACTION SHEET =====
+function openAS(date,time){
+  selectedSlot={date,time,endTime:''};
+  const wd=['日','月','火','水','木','金','土'];
+  const dd=new Date(date);
+  document.getElementById('asTitle').textContent=(dd.getMonth()+1)+'/'+dd.getDate()+'（'+wd[dd.getDay()]+'）'+time;
+  document.getElementById('asSub').textContent='この時間に追加';
+  const el=document.getElementById('actionSheet');
+  el.style.display='flex';
+}
+function closeAS(e){
+  if(e&&e.target&&e.target.id!=='actionSheet') return;
+  document.getElementById('actionSheet').style.display='none';
+}
+function asToReservation(){
+  document.getElementById('actionSheet').style.display='none';
+  openAddReservation(selectedSlot.date,selectedSlot.time);
+}
+function asToBlock(){
+  document.getElementById('actionSheet').style.display='none';
+  openBlockModal(selectedSlot.date,selectedSlot.time);
+}
+
+function changeDate(d){viewDate=new Date(viewDate.getTime()+d*864e5);renderSchedule()}
+function goToday(){viewDate=new Date();renderSchedule()}
+
+// ===== LIST =====
+function renderList(){
+  let f=reservations;
+  if(currentFilter!=='all') f=f.filter(r=>r.status===currentFilter);
+  f=f.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+  const el=document.getElementById('resList');
+  if(!f.length){el.innerHTML='<div class="empty-state"><p>該当する予約はありません</p></div>';return}
+  let last='',html='';
+  const wd=['日','月','火','水','木','金','土'];
+  f.forEach(r=>{
+    if(r.date!==last){last=r.date;const dd=new Date(r.date);html+='<div class="section-title">'+(dd.getMonth()+1)+'/'+dd.getDate()+'（'+wd[dd.getDay()]+'）</div>'}
+    html+=resCard(r);
   });
+  el.innerHTML=html;
+}
+function filterList(s,btn){currentFilter=s;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderList()}
+
+// ===== CARD =====
+function isPast(r){return new Date(r.date+'T'+(r.endTime||r.time))<new Date()}
+function resCard(r){
+  let l,c;
+  if(r.status==='cancelled'){l='キャンセル';c='status-cancelled'}
+  else if(isPast(r)){l='来店済み';c='status-visited'}
+  else if(r.source==='manual'){l='口頭予約';c='status-manual'}
+  else{l='確定';c='status-confirmed'}
+  return '<div class="res-card" onclick="showDetail('+r.id+')">'
+    +'<div class="res-time"><div class="time">'+r.time+'</div><div class="dur">'+r.duration+'分</div></div>'
+    +'<div class="res-info"><div class="res-name">'+r.name+'</div><div class="res-menu">'+r.menu+'</div></div>'
+    +'<span class="res-status '+c+'">'+l+'</span></div>';
 }
 
-// ── Delete ──
-function showDeleteConfirm(){ document.getElementById('deleteConfirm').style.display='block'; }
-function hideDeleteConfirm(){ document.getElementById('deleteConfirm').style.display='none'; }
-
-function doDelete(){
-  if(!editingMenu) return;
-  showLoading();
-  apiPost({action:'deleteMenu', menuId:editingMenu.menuId}).then(function(res){
-    hideLoading();
-    if(res.success){
-      showToast('削除しました','success');
-      closeEdit();
-      loadMenus();
-    } else {
-      showToast('削除に失敗: '+(res.error||''),'error');
-    }
-  }).catch(function(){
-    hideLoading();
-    showToast('通信エラー','error');
-  });
+// ===== CUSTOMER HISTORY =====
+function getCustomerHistory(phone,currentId){
+  if(!phone) return [];
+  return reservations.filter(r=>r.phone===phone&&r.id!==currentId&&r.status==='confirmed')
+    .sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
 }
 
-// ── API Helpers ──
-function apiGet(params){
-  var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
-  return fetch(GAS_URL+'?'+qs).then(function(r){ return r.json(); });
+function historyRow(h){
+  const dd=new Date(h.date);
+  return '<div class="history-item">'
+    +'<div class="history-date">'+(dd.getMonth()+1)+'/'+dd.getDate()+'</div>'
+    +'<div class="history-detail"><div class="history-menu">'+h.menu+'</div>'
+    +(h.customerMemo?'<div class="history-sub">'+h.customerMemo+'</div>':'')
+    +'</div>'
+    +(h.price?'<div class="history-price">¥'+h.price.toLocaleString()+'</div>':'')
+    +'</div>';
 }
-function apiPost(body){
-  return fetch(GAS_URL, {
-    method:'POST',
-    headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify(body)
-  }).then(function(r){ return r.json(); });
-}
-
-// ── UI Helpers ──
-function showLoading(){ document.getElementById('loading').classList.add('show'); }
-function hideLoading(){ document.getElementById('loading').classList.remove('show'); }
-
-function showToast(msg, type){
-  var old = document.querySelector('.toast');
-  if(old) old.remove();
-  var t = document.createElement('div');
-  t.className = 'toast toast-' + (type||'success');
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); },400); }, 2500);
-}
-
-// ── Tab switching ──
-var currentTab = 'menu';
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById('tabMenu').classList.toggle('active', tab === 'menu');
-  document.getElementById('tabRsv').classList.toggle('active', tab === 'rsv');
-  document.getElementById('tabMenuContent').style.display = tab === 'menu' ? 'block' : 'none';
-  document.getElementById('tabRsvContent').style.display = tab === 'rsv' ? 'block' : 'none';
-  document.getElementById('fabMenu').style.display = tab === 'menu' ? 'flex' : 'none';
-  if (tab === 'rsv' && reservations.length === 0) loadReservations();
-}
-
-// ── Reservation Management ──
-var reservations = [];
-var editingRsv = null;
-var rsvFilter = 'upcoming';
-
-function loadReservations() {
-  showLoading();
-  apiGet({ action: 'getReservations' }).then(function(res) {
-    hideLoading();
-    if (res.success) {
-      reservations = res.data.reservations;
-      renderRsvList();
-    } else {
-      showToast(res.error || '予約読み込み失敗', 'error');
-    }
-  }).catch(function() {
-    hideLoading();
-    showToast('通信エラー', 'error');
-  });
-}
-
-function filterRsv(f) {
-  rsvFilter = f;
-  document.querySelectorAll('.rsv-filter-btn').forEach(function(b) { b.classList.remove('active'); });
-  var btnId = { upcoming: 'filterUpcoming', past: 'filterPast', cancelled: 'filterCancelled', all: 'filterAll' };
-  document.getElementById(btnId[f]).classList.add('active');
-  renderRsvList();
-}
-
-function renderRsvList() {
-  var container = document.getElementById('rsvListContainer');
-  container.innerHTML = '';
-  var today = new Date();
-  var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-
-  var filtered = reservations.filter(function(r) {
-    var status = (r['ステータス'] || '').toString();
-    var dateStr = (r['予約日'] || '').toString();
-    if (rsvFilter === 'upcoming') return status !== 'キャンセル' && dateStr >= todayStr;
-    if (rsvFilter === 'past') return status !== 'キャンセル' && dateStr < todayStr;
-    if (rsvFilter === 'cancelled') return status === 'キャンセル';
-    return true; // all
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="icon">📅</div><div class="title">予約がありません</div></div>';
-    return;
+function renderHistory(hist){
+  if(!hist.length) return '<div style="color:#86868b;font-size:.85rem;padding:.5rem 0;">履歴なし（初回来店）</div>';
+  let html=historyRow(hist[0]);
+  if(hist.length>1){
+    html+='<div id="historyMore" style="display:none;">'+hist.slice(1).map(h=>historyRow(h)).join('')+'</div>'
+      +'<button id="historyToggle" onclick="toggleHistory()" style="width:100%;padding:.6rem;border:1px solid #e5e5ea;border-radius:10px;background:#fff;color:#06C755;font-size:.85rem;font-weight:600;cursor:pointer;margin-top:.5rem;-webkit-tap-highlight-color:transparent;">過去の履歴をもっと見る（'+hist.slice(1).length+'件）</button>';
   }
-
-  filtered.forEach(function(r) {
-    var isCancelled = (r['ステータス'] || '') === 'キャンセル';
-    var el = document.createElement('div');
-    el.className = 'rsv-item' + (isCancelled ? ' cancelled' : '');
-
-    var badge = isCancelled
-      ? '<span class="rsv-badge rsv-badge-cancel">キャンセル</span>'
-      : '<span class="rsv-badge rsv-badge-ok">確定</span>';
-
-    var phone = r['電話番号'] || '';
-    var email = r['メールアドレス'] || '';
-    var contactParts = [];
-    if (phone) contactParts.push('📞 ' + phone);
-    if (email) contactParts.push('✉ ' + email);
-
-    el.innerHTML =
-      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-        '<div class="rsv-date">📅 ' + (r['予約日'] || '') + ' ' + (r['予約時間'] || '') + '</div>' +
-        badge +
-      '</div>' +
-      '<div class="rsv-name">' + (r['お名前'] || '名前なし') + '</div>' +
-      '<div class="rsv-detail">' + (r['メニュー'] || '') + '</div>' +
-      '<div class="rsv-detail">¥' + ((r['合計金額'] || 0).toLocaleString ? (r['合計金額'] || 0).toLocaleString() : r['合計金額']) + ' / ' + (r['所要時間'] || '') + '分</div>' +
-      '<div class="rsv-contact">' + contactParts.join(' ｜ ') + '</div>';
-
-    if (!isCancelled) {
-      el.style.cursor = 'pointer';
-      el.onclick = function() { openRsvEdit(r); };
-    }
-    container.appendChild(el);
-  });
+  return html;
+}
+function toggleHistory(){
+  const el=document.getElementById('historyMore'),btn=document.getElementById('historyToggle');
+  if(el.style.display==='none'){el.style.display='block';btn.textContent='閉じる'}
+  else{el.style.display='none';btn.textContent='過去の履歴をもっと見る'}
 }
 
-function openRsvEdit(r) {
-  editingRsv = r;
-  document.getElementById('rsvEditTitle').textContent = '予約詳細';
-  document.getElementById('rsvCustName').textContent = (r['お名前'] || '') + '様';
+// ===== DETAIL MODAL =====
+function showDetail(id){
+  const r=reservations.find(x=>x.id===id);
+  if(!r) return;
 
-  var phone = r['電話番号'] || '';
-  var email = r['メールアドレス'] || '';
-  var uid = r['LINE_UID'] || '';
-  var contacts = [];
-  if (phone) contacts.push('📞 ' + phone);
-  if (email) contacts.push('✉ ' + email);
-  if (uid) contacts.push('💬 LINE連携済み');
-  document.getElementById('rsvCustContact').innerHTML = contacts.join('<br>');
+  let stLabel,stClass;
+  if(r.status==='cancelled'){stLabel='キャンセル';stClass='status-cancelled'}
+  else if(isPast(r)){stLabel='来店済み';stClass='status-visited'}
+  else if(r.source==='manual'){stLabel='口頭予約';stClass='status-manual'}
+  else{stLabel='確定';stClass='status-confirmed'}
 
-  // Date
-  var dateStr = (r['予約日'] || '').toString();
-  if (dateStr) {
-    // Convert YYYY/MM/DD or YYYY-MM-DD to input format
-    document.getElementById('rsvEditDate').value = dateStr.replace(/\//g, '-');
+  const hist=getCustomerHistory(r.phone,r.id);
+  const visitCount=hist.length+1;
+  const totalSpent=hist.reduce((s,h)=>s+(h.price||0),0)+(r.price||0);
+
+  document.getElementById('modalTitle').innerHTML=r.name
+    +(visitCount>1?'<span class="visit-count-badge">来店'+visitCount+'回目</span>':'<span class="visit-count-badge" style="background:#ff9800;">初回</span>');
+
+  document.getElementById('modalBody').innerHTML=
+    '<div class="detail-row"><div class="detail-label">日時</div><div class="detail-value">'+r.date+' '+r.time+'〜'+r.endTime+'</div></div>'
+    +'<div class="detail-row"><div class="detail-label">メニュー</div><div class="detail-value">'+r.menu+'（'+r.duration+'分）</div></div>'
+    +'<div class="detail-row"><div class="detail-label">金額</div><div class="detail-value" style="font-weight:700;color:#06C755;">'+(r.price?'¥'+r.price.toLocaleString():'未設定')+'</div></div>'
+    +'<div class="detail-row"><div class="detail-label">電話番号</div><div class="detail-value">'+(r.phone?'<a href="tel:'+r.phone+'" style="color:#06C755;font-weight:600;font-size:1.05rem;">'+r.phone+'</a>':'未登録')+'</div></div>'
+    +'<div class="detail-row"><div class="detail-label">予約経路</div><div class="detail-value">'+(r.source==='manual'?'口頭（電話・来店）':'LINE')+'</div></div>'
+    +'<div class="detail-row"><div class="detail-label">ステータス</div><div class="detail-value"><span class="res-status '+stClass+'">'+stLabel+'</span></div></div>'
+    +(r.note?'<div class="detail-row"><div class="detail-label">予約メモ</div><div class="detail-value">'+r.note+'</div></div>':'')
+    +'<div style="margin-top:1rem;"><div class="form-label">顧客メモ（スタッフ用）</div>'
+    +'<textarea class="form-input form-textarea" id="customerMemoInput" placeholder="お客様の好み、注意点などを記録...">'+(r.customerMemo||'')+'</textarea></div>'
+    +'<div class="section-title" style="margin-top:1.2rem;">来店履歴'+(totalSpent?' <span style="font-weight:400;font-size:.75rem;color:#06C755;">合計 ¥'+totalSpent.toLocaleString()+'</span>':'')+'</div>'
+    +'<div>'+renderHistory(hist)+'</div>';
+
+  let act='<button class="btn btn-primary" onclick="saveMemo('+r.id+')">メモを保存</button>';
+  if(r.status==='confirmed'&&!isPast(r)){
+    act+='<button class="btn btn-danger" onclick="confirmCancel('+r.id+')">キャンセルする</button>';
   }
-  // Time
-  document.getElementById('rsvEditTime').value = r['予約時間'] || '';
-  document.getElementById('rsvEditMenu').value = r['メニュー'] || '';
-  document.getElementById('rsvEditPrice').textContent = '¥' + ((r['合計金額'] || 0).toLocaleString ? (r['合計金額'] || 0).toLocaleString() : r['合計金額']);
-
-  document.getElementById('rsvCancelConfirm').style.display = 'none';
-  document.getElementById('rsvEditPanel').classList.add('open');
-  document.body.classList.add('no-scroll');
+  act+='<button class="btn btn-outline" onclick="closeModal()">閉じる</button>';
+  document.getElementById('modalActions').innerHTML=act;
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
-function closeRsvEdit() {
-  document.getElementById('rsvEditPanel').classList.remove('open');
-  document.body.classList.remove('no-scroll');
-  editingRsv = null;
+function showBlockDetail(id){
+  const b=blocks.find(x=>x.id===id);if(!b) return;
+  document.getElementById('modalTitle').textContent='受付不可';
+  document.getElementById('modalBody').innerHTML=
+    '<div class="detail-row"><div class="detail-label">日付</div><div class="detail-value">'+b.date+'</div></div>'
+    +'<div class="detail-row"><div class="detail-label">時間</div><div class="detail-value">'+b.startTime+'〜'+b.endTime+'</div></div>'
+    +'<div class="detail-row"><div class="detail-label">理由</div><div class="detail-value">'+(b.reason||'-')+'</div></div>';
+  document.getElementById('modalActions').innerHTML=
+    '<button class="btn btn-danger" onclick="deleteBlock('+b.id+')">解除する</button>'
+    +'<button class="btn btn-outline" onclick="closeModal()">閉じる</button>';
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
-function showRsvCancelConfirm() { document.getElementById('rsvCancelConfirm').style.display = 'block'; }
-function hideRsvCancelConfirm() { document.getElementById('rsvCancelConfirm').style.display = 'none'; }
+// ===== SAVE MEMO =====
+async function saveMemo(id){
+  const r=reservations.find(x=>x.id===id);if(!r) return;
+  r.customerMemo=document.getElementById('customerMemoInput').value;
+  if(GAS_URL){try{await fetch(GAS_URL+'?action=saveMemo&token='+AUTH_TOKEN+'&id='+id+'&memo='+encodeURIComponent(r.customerMemo))}catch(e){}}
+  toast('メモを保存しました');renderHome();
+}
 
-function doRsvCancel() {
-  if (!editingRsv) return;
-  var reason = document.getElementById('rsvCancelReason').value.trim() || '管理者によるキャンセル';
-  showLoading();
-  apiPost({
-    action: 'cancelReservation',
-    password: 'yorunail2026',
-    rowNumber: editingRsv._row,
-    reason: reason
-  }).then(function(res) {
-    hideLoading();
-    if (res.success) {
-      showToast('キャンセルしました。お客様に通知を送信しました。', 'success');
-      closeRsvEdit();
-      loadReservations();
-    } else {
-      showToast('キャンセル失敗: ' + (res.error || ''), 'error');
+// ===== STATUS =====
+async function updateStatus(id,s){
+  const r=reservations.find(x=>x.id===id);if(!r) return;
+  r.status=s;
+  if(GAS_URL){try{await fetch(GAS_URL+'?action=updateStatus&token='+AUTH_TOKEN+'&id='+id+'&status='+s)}catch(e){}}
+  closeModal();toast('キャンセルしました');renderHome();renderSchedule();renderList();
+}
+function confirmCancel(id){if(confirm('この予約をキャンセルしますか？\nLINE予約の場合、お客様に通知が送信されます。'))updateStatus(id,'cancelled')}
+
+// ===== BLOCK =====
+function timeOptions(selected){
+  const open=parseInt(settings.openTime)||10,close=parseInt(settings.closeTime)||20;
+  let html='';
+  for(let h=open;h<=close;h++){
+    for(let m=0;m<60;m+=15){
+      if(h===close&&m>0)break;
+      const v=(''+ h).padStart(2,'0')+':'+(''+ m).padStart(2,'0');
+      html+='<option value="'+v+'"'+(v===selected?' selected':'')+'>'+v+'</option>';
     }
-  }).catch(function() {
-    hideLoading();
-    showToast('通信エラー', 'error');
-  });
-}
-
-function saveRsvChanges() {
-  if (!editingRsv) return;
-  var newDate = document.getElementById('rsvEditDate').value;
-  var newTime = document.getElementById('rsvEditTime').value;
-  var newMenu = document.getElementById('rsvEditMenu').value;
-
-  var updates = {};
-  var oldDate = (editingRsv['予約日'] || '').toString().replace(/\//g, '-');
-  if (newDate && newDate !== oldDate) updates.date = newDate;
-  if (newTime && newTime !== editingRsv['予約時間']) updates.time = newTime;
-  if (newMenu && newMenu !== editingRsv['メニュー']) updates.menuLabel = newMenu;
-
-  if (Object.keys(updates).length === 0) {
-    showToast('変更がありません', 'error');
-    return;
   }
+  return html;
+}
+function openBlockModal(date,time){
+  const ds=date||fmtDate(viewDate);
+  const startT=time||'12:00';
+  const endT=minToStr(Math.min(toMin(startT)+120, toMin((settings.closeTime||20)+':00')));
+  document.getElementById('modalTitle').textContent='受付不可を設定';
+  document.getElementById('modalBody').innerHTML=
+    '<div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="blockDate" value="'+ds+'"></div>'
+    +'<div class="form-row">'
+    +'<div class="form-group"><label class="form-label">開始</label><select class="form-input" id="blockStart">'+timeOptions(startT)+'</select></div>'
+    +'<div class="form-group"><label class="form-label">終了</label><select class="form-input" id="blockEnd">'+timeOptions(endT)+'</select></div>'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">理由（任意）</label><input type="text" class="form-input" id="blockReason" placeholder="例：昼休憩、私用"></div>';
+  document.getElementById('modalActions').innerHTML=
+    '<button class="btn btn-primary" onclick="saveBlock()">設定する</button>'
+    +'<button class="btn btn-outline" onclick="closeModal()">やめる</button>';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+async function saveBlock(){
+  const date=document.getElementById('blockDate').value,start=document.getElementById('blockStart').value,end=document.getElementById('blockEnd').value,reason=document.getElementById('blockReason').value;
+  if(!date||!start||!end){toast('日付と時間を入力してください');return}
+  if(start>=end){toast('終了時間は開始時間より後にしてください');return}
+  blocks.push({id:nextBlockId++,date,startTime:start,endTime:end,reason});
+  if(GAS_URL){try{await fetch(GAS_URL+'?action=addBlock&token='+AUTH_TOKEN+'&date='+date+'&start='+start+'&end='+end+'&reason='+encodeURIComponent(reason))}catch(e){}}
+  closeModal();toast('受付不可を設定しました');renderSchedule();
+}
+async function deleteBlock(id){
+  blocks=blocks.filter(b=>b.id!==id);
+  if(GAS_URL){try{await fetch(GAS_URL+'?action=deleteBlock&token='+AUTH_TOKEN+'&id='+id)}catch(e){}}
+  closeModal();toast('受付不可を解除しました');renderSchedule();
+}
 
-  showLoading();
-  apiPost({
-    action: 'updateReservation',
-    password: 'yorunail2026',
-    rowNumber: editingRsv._row,
-    updates: updates
-  }).then(function(res) {
-    hideLoading();
-    if (res.success) {
-      showToast('変更を保存しました。お客様に通知を送信しました。', 'success');
-      closeRsvEdit();
-      loadReservations();
-    } else {
-      showToast('変更失敗: ' + (res.error || ''), 'error');
-    }
-  }).catch(function() {
-    hideLoading();
-    showToast('通信エラー', 'error');
+// ===== HOLIDAY =====
+function openHolidayModal(){
+  const ds=fmtDate(viewDate);
+  document.getElementById('modalTitle').textContent='休業日を設定';
+  document.getElementById('modalBody').innerHTML=
+    '<div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="holidayDate" value="'+ds+'"></div>'
+    +'<div class="form-group"><label class="form-label">理由（任意）</label><input type="text" class="form-input" id="holidayReason" placeholder="例：研修、体調不良"></div>';
+  document.getElementById('modalActions').innerHTML=
+    '<button class="btn btn-danger" onclick="saveHoliday()">休業にする</button>'
+    +'<button class="btn btn-outline" onclick="closeModal()">やめる</button>';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+async function saveHoliday(){
+  const date=document.getElementById('holidayDate').value,reason=document.getElementById('holidayReason').value;
+  if(!date){toast('日付を入力してください');return}
+  if(holidays.find(h=>h.date===date)){toast('この日は既に休業日です');return}
+  holidays.push({date,reason});
+  if(GAS_URL){try{await fetch(GAS_URL+'?action=addHoliday&token='+AUTH_TOKEN+'&date='+date+'&reason='+encodeURIComponent(reason))}catch(e){}}
+  closeModal();toast('休業日を設定しました');renderSchedule();renderHolidayList();
+}
+async function deleteHoliday(date){
+  if(!confirm(date+' の休業日を解除しますか？'))return;
+  holidays=holidays.filter(h=>h.date!==date);
+  if(GAS_URL){try{await fetch(GAS_URL+'?action=deleteHoliday&token='+AUTH_TOKEN+'&date='+date)}catch(e){}}
+  toast('休業日を解除しました');renderSchedule();renderHolidayList();
+}
+function renderHolidayList(){
+  const el=document.getElementById('holidayList');
+  const future=holidays.filter(h=>h.date>=fmtDate(new Date())).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!future.length){el.innerHTML='<div style="text-align:center;padding:1rem;color:#86868b;font-size:.85rem;">設定なし</div>';return}
+  const wd=['日','月','火','水','木','金','土'];
+  el.innerHTML=future.map(h=>{const dd=new Date(h.date);return '<div class="holiday-item"><div class="holiday-info"><div class="holiday-date">'+(dd.getMonth()+1)+'/'+dd.getDate()+'（'+wd[dd.getDay()]+'）</div><div class="holiday-reason">'+(h.reason||'-')+'</div></div><button class="delete-btn" onclick="deleteHoliday(\''+h.date+'\')">✕</button></div>'}).join('');
+}
+
+// ===== ADD RESERVATION =====
+function openAddReservation(date,time){
+  const ds=date||fmtDate(viewDate);
+  const startT=time||(settings.openTime?((''+(settings.openTime)).padStart(2,'0')+':00'):'10:00');
+  const dur=120;
+  document.getElementById('modalTitle').textContent='口頭予約を追加';
+  document.getElementById('modalBody').innerHTML=
+    '<div class="form-row">'
+    +'<div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="addDate" value="'+ds+'"></div>'
+    +'<div class="form-group"><label class="form-label">開始時間</label><select class="form-input" id="addTime">'+timeOptions(startT)+'</select></div>'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">施術時間（分）</label>'
+    +'<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem;">'
+    +[30,60,90,120,150,180].map(function(v){return '<button type="button" class="dur-btn'+(v===dur?' active':'')+'" onclick="pickDur('+v+',this)">'+v+'</button>'}).join('')
+    +'</div>'
+    +'<input type="number" class="form-input" id="addDuration" value="'+dur+'" min="15" step="15" style="width:120px;" onchange="syncDurBtns(this.value)">'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">お客様名</label><input type="text" class="form-input" id="addName" placeholder="例：山田 太郎"></div>'
+    +'<div class="form-group"><label class="form-label">メニュー</label><input type="text" class="form-input" id="addMenu" placeholder="例：ジェルネイル"></div>'
+    +'<div class="form-row">'
+    +'<div class="form-group"><label class="form-label">金額（税込）</label><input type="number" class="form-input" id="addPrice" placeholder="6000" min="0" step="100"></div>'
+    +'<div class="form-group"><label class="form-label">電話番号</label><input type="tel" class="form-input" id="addPhone" placeholder="090-0000-0000" oninput="checkLineLink()"></div>'
+    +'</div>'
+    +'<div id="lineLinkInfo"></div>'
+    +'<div class="form-group"><label class="form-label">メモ（任意）</label><textarea class="form-input form-textarea" id="addNote" placeholder="お客様情報など"></textarea></div>';
+  document.getElementById('modalActions').innerHTML=
+    '<button class="btn btn-warning" onclick="saveReservation()">口頭予約を追加</button>'
+    +'<button class="btn btn-outline" onclick="closeModal()">やめる</button>';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function pickDur(min,btn){
+  document.getElementById('addDuration').value=min;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function syncDurBtns(val){
+  const v=parseInt(val);
+  document.querySelectorAll('.dur-btn').forEach(b=>{
+    b.classList.toggle('active',parseInt(b.textContent)===v);
   });
 }
+function checkLineLink(){
+  const phone=document.getElementById('addPhone').value.trim();
+  const el=document.getElementById('lineLinkInfo');
+  if(!phone||phone.length<10){el.innerHTML='';return}
+  const past=reservations.find(r=>r.phone===phone&&r.lineUid);
+  if(past){
+    el.innerHTML='<div style="background:#e8f5e9;border-radius:10px;padding:.7rem;margin:.5rem 0;font-size:.85rem;">'
+      +'<span style="color:#2e7d32;font-weight:600;">LINE連携済み：'+past.name+'</span><br>'
+      +'<label style="display:flex;align-items:center;gap:.4rem;margin-top:.3rem;cursor:pointer;">'
+      +'<input type="checkbox" id="sendLineNotify" checked style="width:18px;height:18px;accent-color:#06C755;">'
+      +'<span style="font-size:.85rem;">LINEに予約確認を通知する</span></label></div>';
+  }else{
+    el.innerHTML='<div style="color:#86868b;font-size:.8rem;margin:.3rem 0;">この電話番号のLINE登録はありません</div>';
+  }
+}
+
+async function saveReservation(){
+  const date=document.getElementById('addDate').value,time=document.getElementById('addTime').value;
+  const duration=parseInt(document.getElementById('addDuration').value)||60;
+  const name=document.getElementById('addName').value.trim(),menu=document.getElementById('addMenu').value.trim();
+  const phone=document.getElementById('addPhone').value.trim(),note=document.getElementById('addNote').value.trim();
+  const price=parseInt(document.getElementById('addPrice').value)||0;
+  if(!date||!time||!name||!menu){toast('日付・時間・名前・メニューは必須です');return}
+  const [hh,mm]=time.split(':').map(Number);
+  const endMin=hh*60+mm+duration;
+  const endTime=(''+(endMin/60|0)).padStart(2,'0')+':'+(''+(endMin%60)).padStart(2,'0');
+  // LINE紐付けチェック
+  let lineUid='';
+  let sendLine=false;
+  const pastLine=phone?reservations.find(r=>r.phone===phone&&r.lineUid):null;
+  if(pastLine){
+    lineUid=pastLine.lineUid;
+    const cb=document.getElementById('sendLineNotify');
+    sendLine=cb&&cb.checked;
+  }
+  const r={id:nextId++,date,time,endTime,duration,name,menu,phone,status:'confirmed',source:'manual',lineUid,note,customerMemo:note,price};
+  reservations.push(r);
+  if(GAS_URL){try{const params=new URLSearchParams({action:'addReservation',token:AUTH_TOKEN,date,time,endTime,duration:String(duration),name,menu,phone,note,source:'manual',price:String(price),lineUid,sendLine:sendLine?'1':'0'});await fetch(GAS_URL+'?'+params.toString())}catch(e){}}
+  closeModal();toast(name+'さんの予約を追加しました');renderHome();renderSchedule();renderList();
+}
+
+// ===== MODAL / NAV / TOAST / UTIL =====
+function closeModal(e){if(e&&e.target!==document.getElementById('modalOverlay'))return;document.getElementById('modalOverlay').classList.remove('open')}
+function showPage(n,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));document.getElementById('page'+n).classList.add('active');btn.classList.add('active');if(n==='Schedule'){viewDate=new Date();renderSchedule()}}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)}
+function exportCSV(){
+  const h=['日付','時間','終了','名前','メニュー','所要時間','金額','ステータス','予約経路','電話番号','メモ','顧客メモ'];
+  const rows=reservations.map(r=>[r.date,r.time,r.endTime,r.name,r.menu,r.duration,r.price||'',r.status,r.source||'line',r.phone,r.note,r.customerMemo||'']);
+  const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>'"'+c+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='予約データ_'+fmtDate(new Date())+'.csv';a.click();toast('CSVをダウンロードしました');
+}
+function fmtDate(d){return d.getFullYear()+'-'+(''+(d.getMonth()+1)).padStart(2,'0')+'-'+(''+ d.getDate()).padStart(2,'0')}
+
+init();
 </script>
 </body>
 </html>
