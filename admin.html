@@ -91,7 +91,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
 .cat-icon.pink{background:#fce4ec}.cat-icon.amber{background:#fff3e0}.cat-icon.blue{background:#e3f2fd}.cat-icon.green{background:#e8f5e9}
 .fab{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0));right:1rem;width:56px;height:56px;border-radius:50%;background:#06C755;color:#fff;border:none;font-size:1.8rem;box-shadow:0 4px 12px rgba(6,199,85,.4);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:90;-webkit-tap-highlight-color:transparent}
 .fab:active{transform:scale(.9)}
-.edit-panel{position:fixed;inset:0;background:#f5f5f7;z-index:250;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.edit-panel{position:fixed;inset:0;background:#f5f5f7;z-index:250;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}
+.edit-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:1rem}
 .edit-panel.open{transform:translateX(0)}
 .edit-header{display:flex;align-items:center;gap:.8rem;padding:1rem;background:#fff;border-bottom:1px solid #e5e5ea;position:sticky;top:0;z-index:10}
 .edit-body{padding:1rem}
@@ -109,7 +110,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
 .toggle-switch.on::after{transform:translateX(22px)}
 .select-field{width:100%;padding:.7rem .8rem;border:1px solid #d1d1d6;border-radius:10px;font-size:.95rem;font-family:inherit;background:#fff;-webkit-appearance:none;appearance:none}
 body.no-scroll{overflow:hidden}
-.action-bar{position:fixed;bottom:0;left:0;right:0;padding:1rem;background:#fff;border-top:1px solid #e5e5ea;display:flex;gap:.5rem;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0));z-index:260}
+.action-bar{padding:1rem;background:#fff;border-top:1px solid #e5e5ea;display:flex;gap:.5rem;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0));flex-shrink:0}
 .delete-confirm{background:#fce4ec;border-radius:10px;padding:1rem;margin-top:.5rem}
 .delete-confirm p{font-size:.85rem;color:#c62828;margin-bottom:.8rem}
 .delete-confirm .btns{display:flex;gap:.5rem}
@@ -289,39 +290,41 @@ body.no-scroll{overflow:hidden}
 
 <!-- MENU EDIT PANEL -->
 <div id="editPanel" class="edit-panel">
-  <div class="edit-header">
-    <button class="btn btn-outline" style="width:auto;padding:8px 14px;margin-top:0;" onclick="closeEdit()">✕ 戻る</button>
-    <h2 id="editTitle" style="font-size:1.1rem;font-weight:700;margin:0;">メニュー編集</h2>
-  </div>
-  <div class="edit-body" style="padding-bottom:calc(100px + env(safe-area-inset-bottom));">
-    <div class="form-group">
-      <label class="form-label">写真</label>
-      <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
-        <div class="placeholder" id="photoPlaceholder"><div class="icon">📷</div><div class="text">タップして写真を選択</div></div>
-        <img id="photoPreview" style="display:none">
-        <div class="overlay"><div style="font-size:24px;">📷</div><div style="font-size:.85rem;font-weight:600;">写真を変更</div></div>
+  <div class="edit-scroll">
+    <div class="edit-header">
+      <button class="btn btn-outline" style="width:auto;padding:8px 14px;margin-top:0;" onclick="closeEdit()">✕ 戻る</button>
+      <h2 id="editTitle" style="font-size:1.1rem;font-weight:700;margin:0;">メニュー編集</h2>
+    </div>
+    <div class="edit-body">
+      <div class="form-group">
+        <label class="form-label">写真</label>
+        <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+          <div class="placeholder" id="photoPlaceholder"><div class="icon">📷</div><div class="text">タップして写真を選択</div></div>
+          <img id="photoPreview" style="display:none">
+          <div class="overlay"><div style="font-size:24px;">📷</div><div style="font-size:.85rem;font-weight:600;">写真を変更</div></div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+        <div style="font-size:.75rem;color:#86868b;margin-top:.3rem;">推奨: 正方形の写真（1:1）</div>
       </div>
-      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
-      <div style="font-size:.75rem;color:#86868b;margin-top:.3rem;">推奨: 正方形の写真（1:1）</div>
-    </div>
-    <div class="form-group"><label class="form-label">メニュー名</label><input class="form-input" type="text" id="editName" placeholder="例: マオジェル ワンカラー"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">料金（税込）</label><input class="form-input" type="number" id="editPrice" placeholder="8000" inputmode="numeric"></div>
-      <div class="form-group"><label class="form-label">所要時間（分）</label><input class="form-input" type="number" id="editMinutes" placeholder="90" inputmode="numeric"></div>
-    </div>
-    <div class="form-group"><label class="form-label">説明文</label><textarea class="form-input form-textarea" id="editDesc" rows="3" placeholder="例: ドライケア込・フィルイン対応"></textarea></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">カテゴリ</label><select class="select-field" id="editCategory"><option value="人気メニュー">人気メニュー</option><option value="マオジェルメニュー">マオジェルメニュー</option><option value="デザインメニュー">デザインメニュー</option><option value="オフ">オフ</option></select></div>
-      <div class="form-group"><label class="form-label">タイプ</label><select class="select-field" id="editType"><option value="main">メイン施術</option><option value="off">オフ（付け替え）</option></select></div>
-    </div>
-    <div class="form-group">
-      <div class="toggle-row"><span class="toggle-label">メニューを表示する</span><div class="toggle-switch" id="toggleEnabled" onclick="toggleSwitch(this)"></div></div>
-      <div class="toggle-row"><span class="toggle-label">人気バッジを表示</span><div class="toggle-switch" id="togglePopular" onclick="toggleSwitch(this)"></div></div>
-    </div>
-    <div class="form-group"><label class="form-label">表示順</label><input class="form-input" type="number" id="editSort" placeholder="1" inputmode="numeric" style="width:100px;"><div style="font-size:.75rem;color:#86868b;margin-top:.2rem;">小さい数字ほど上に表示</div></div>
-    <div id="deleteSection" style="margin-top:2rem;">
-      <button class="btn btn-outline" style="color:#ff3b30;border-color:#ff3b30;width:auto;margin-top:0;" onclick="showDeleteConfirm()">このメニューを削除</button>
-      <div id="deleteConfirm" class="delete-confirm" style="display:none"><p>本当に削除しますか？この操作は取り消せません。</p><div class="btns"><button class="btn btn-outline" style="flex:1;margin-top:0;" onclick="hideDeleteConfirm()">キャンセル</button><button class="btn btn-danger" style="flex:1;margin-top:0;" onclick="doDeleteMenu()">削除する</button></div></div>
+      <div class="form-group"><label class="form-label">メニュー名</label><input class="form-input" type="text" id="editName" placeholder="例: マオジェル ワンカラー"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">料金（税込）</label><input class="form-input" type="number" id="editPrice" placeholder="8000" inputmode="numeric"></div>
+        <div class="form-group"><label class="form-label">所要時間（分）</label><input class="form-input" type="number" id="editMinutes" placeholder="90" inputmode="numeric"></div>
+      </div>
+      <div class="form-group"><label class="form-label">説明文</label><textarea class="form-input form-textarea" id="editDesc" rows="3" placeholder="例: ドライケア込・フィルイン対応"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">カテゴリ</label><select class="select-field" id="editCategory"><option value="人気メニュー">人気メニュー</option><option value="マオジェルメニュー">マオジェルメニュー</option><option value="デザインメニュー">デザインメニュー</option><option value="オフ">オフ</option></select></div>
+        <div class="form-group"><label class="form-label">タイプ</label><select class="select-field" id="editType"><option value="main">メイン施術</option><option value="off">オフ（付け替え）</option></select></div>
+      </div>
+      <div class="form-group">
+        <div class="toggle-row"><span class="toggle-label">メニューを表示する</span><div class="toggle-switch" id="toggleEnabled" onclick="toggleSwitch(this)"></div></div>
+        <div class="toggle-row"><span class="toggle-label">人気バッジを表示</span><div class="toggle-switch" id="togglePopular" onclick="toggleSwitch(this)"></div></div>
+      </div>
+      <div class="form-group"><label class="form-label">表示順</label><input class="form-input" type="number" id="editSort" placeholder="1" inputmode="numeric" style="width:100px;"><div style="font-size:.75rem;color:#86868b;margin-top:.2rem;">小さい数字ほど上に表示</div></div>
+      <div id="deleteSection" style="margin-top:2rem;">
+        <button class="btn btn-outline" style="color:#ff3b30;border-color:#ff3b30;width:auto;margin-top:0;" onclick="showDeleteConfirm()">このメニューを削除</button>
+        <div id="deleteConfirm" class="delete-confirm" style="display:none"><p>本当に削除しますか？この操作は取り消せません。</p><div class="btns"><button class="btn btn-outline" style="flex:1;margin-top:0;" onclick="hideDeleteConfirm()">キャンセル</button><button class="btn btn-danger" style="flex:1;margin-top:0;" onclick="doDeleteMenu()">削除する</button></div></div>
+      </div>
     </div>
   </div>
   <div class="action-bar">
