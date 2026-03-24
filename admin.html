@@ -492,6 +492,40 @@ let selectedSlot={date:'',time:'',endTime:''};
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m}
 function minToStr(m){return (''+(m/60|0)).padStart(2,'0')+':'+(''+(m%60)).padStart(2,'0')}
 
+// 予約の警告チェック（休業日・定休日・重複・ブロック時間）
+function checkBookingWarnings(date,startTime,endTime,excludeId){
+  const warns=[];
+  const d=new Date(date);
+  const wdNames=['日','月','火','水','木','金','土'];
+  // 定休日チェック
+  const closed=settings.closedDays||'';
+  if(closed&&closed.includes(wdNames[d.getDay()])){
+    warns.push('「'+wdNames[d.getDay()]+'曜日」は定休日です');
+  }
+  // 休業日チェック
+  if(holidays.find(h=>h.date===date)){
+    warns.push('この日は休業日に設定されています');
+  }
+  // 予約重複チェック
+  const newS=toMin(startTime),newE=toMin(endTime);
+  const overlaps=reservations.filter(r=>
+    r.date===date&&r.status!=='cancelled'
+    &&(excludeId===null||r.id!==excludeId)
+    &&toMin(r.time)<newE&&toMin(r.endTime)>newS
+  );
+  if(overlaps.length>0){
+    warns.push('他の予約と時間が重複しています（'+overlaps.map(r=>r.time+'〜'+r.endTime+' '+r.name).join('、')+' ）');
+  }
+  // ブロック時間重複チェック
+  const blockOverlaps=blocks.filter(b=>
+    b.date===date&&toMin(b.startTime)<newE&&toMin(b.endTime)>newS
+  );
+  if(blockOverlaps.length>0){
+    warns.push('受付不可の時間帯と重複しています（'+blockOverlaps.map(b=>b.startTime+'〜'+b.endTime).join('、')+' ）');
+  }
+  return warns;
+}
+
 function renderSchedule(){
   const d=viewDate,wd=['日','月','火','水','木','金','土'];
   document.getElementById('scheduleDate').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日（'+wd[d.getDay()]+'）';
@@ -751,23 +785,11 @@ async function saveEditReservation(id){
   const phone=document.getElementById('editRPhone').value.trim();
   const note=document.getElementById('editRNote').value.trim();
   if(!date||!time||!name||!menu){toast('日付・時間・名前・メニューは必須です');return}
-  // 休業日・定休日チェック
-  const warns=[];
-  const targetDate=new Date(date);
-  const wdNames=['日','月','火','水','木','金','土'];
-  const closedStr=settings.closedDays||'';
-  if(closedStr&&closedStr.includes(wdNames[targetDate.getDay()])){
-    warns.push('「'+wdNames[targetDate.getDay()]+'曜日」は定休日です');
-  }
-  if(holidays.find(h=>h.date===date)){
-    warns.push('この日は休業日に設定されています');
-  }
-  if(warns.length>0){
-    if(!confirm('⚠️ '+warns.join('\n')+'\n\nこの日に予約を変更しますか？')){return}
-  }
   const [hh,mm]=time.split(':').map(Number);
   const endMin=hh*60+mm+duration;
   const endTime=(''+(endMin/60|0)).padStart(2,'0')+':'+(''+(endMin%60)).padStart(2,'0');
+  const editWarns=checkBookingWarnings(date,time,endTime,id);
+  if(editWarns.length>0&&!confirm('⚠️ '+editWarns.join('\n')+'\n\nこの日時に予約を変更しますか？')){return}
   r.date=date;r.time=time;r.endTime=endTime;r.duration=duration;r.name=name;r.menu=menu;r.price=price;r.phone=phone;r.note=note;
   if(GAS_URL){try{const params=new URLSearchParams({action:'editReservation',token:AUTH_TOKEN,id:String(id),date,time,endTime,duration:String(duration),name,menu,phone,note,price:String(price)});await fetch(GAS_URL+'?'+params.toString())}catch(e){}}
   closeModal();toast(name+'さんの予約を変更しました');renderHome();renderSchedule();renderList();
@@ -915,17 +937,11 @@ async function saveReservation(){
   const phone=document.getElementById('addPhone').value.trim(),note=document.getElementById('addNote').value.trim();
   const price=parseInt(document.getElementById('addPrice').value)||0;
   if(!date||!time||!name||!menu){toast('日付・時間・名前・メニューは必須です');return}
-  // 休業日・定休日チェック
-  const addWarns=[];
-  const addDate=new Date(date);
-  const addWd=['日','月','火','水','木','金','土'];
-  const addClosed=settings.closedDays||'';
-  if(addClosed&&addClosed.includes(addWd[addDate.getDay()])){addWarns.push('「'+addWd[addDate.getDay()]+'曜日」は定休日です')}
-  if(holidays.find(h=>h.date===date)){addWarns.push('この日は休業日に設定されています')}
-  if(addWarns.length>0&&!confirm('⚠️ '+addWarns.join('\n')+'\n\nこの日に予約を追加しますか？')){return}
   const [hh,mm]=time.split(':').map(Number);
   const endMin=hh*60+mm+duration;
   const endTime=(''+(endMin/60|0)).padStart(2,'0')+':'+(''+(endMin%60)).padStart(2,'0');
+  const addWarns=checkBookingWarnings(date,time,endTime,null);
+  if(addWarns.length>0&&!confirm('⚠️ '+addWarns.join('\n')+'\n\nこの日時に予約を追加しますか？')){return}
   // LINE紐付けチェック
   let lineUid='';
   let sendLine=false;
