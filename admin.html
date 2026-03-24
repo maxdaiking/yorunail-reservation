@@ -353,7 +353,7 @@ body.no-scroll{overflow:hidden}
 <div class="toast" id="toast"></div>
 
 <script>
-const GAS_URL='';
+const GAS_URL='https://script.google.com/macros/s/AKfycbwI9uvlhv6pFP6HyxwSKB5PBRV52rWz5eCo9kctBhYcR8RqD3uNOvaRJ53j3AZ5Nhno/exec';
 let AUTH_TOKEN='';
 let viewDate=new Date();
 let reservations=[];
@@ -1009,7 +1009,8 @@ async function saveMenu(){
   const updates={label:name,price,minutes,description:desc,category,type,sortOrder:sort,enabled,popular};
 
   if(!GAS_URL){
-    // Demo mode: update local array
+    // Demo mode: update local array + reflect photo as data URL
+    if(newPhotoData) updates.imageUrl='data:'+newPhotoMime+';base64,'+newPhotoData;
     Object.assign(editingMenu,updates);
     if(isNewMenu){menus.push(editingMenu)}
     else{const idx=menus.findIndex(m=>m.menuId===editingMenu.menuId);if(idx>=0) Object.assign(menus[idx],updates)}
