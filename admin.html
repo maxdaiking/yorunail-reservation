@@ -50,7 +50,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
 .status-manual{background:#fff3e0;color:#e65100}
 
 /* ===== SCHEDULE ===== */
-.schedule-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.schedule-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;position:sticky;top:0;z-index:10;background:#f5f5f7;padding-top:.2rem;padding-bottom:.4rem;margin-top:-.2rem}
 .schedule-date{font-size:1.1rem;font-weight:700}
 .date-nav-btn{width:48px;height:48px;border-radius:50%;border:1px solid #e5e5ea;background:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .date-nav-btn:active{background:#f0f0f0}
@@ -672,8 +672,10 @@ function showDetail(id){
     +'<div>'+renderHistory(hist)+'</div>';
 
   let act='<button class="btn btn-primary" onclick="saveMemo('+r.id+')">メモを保存</button>';
-  if(r.status==='confirmed'&&!isPast(r)){
+  if(r.status!=='cancelled'){
     act+='<button class="btn btn-warning" onclick="openEditReservation('+r.id+')">予約を編集</button>';
+  }
+  if(r.status==='confirmed'&&!isPast(r)){
     act+='<button class="btn btn-danger" onclick="confirmCancel('+r.id+')">キャンセルする</button>';
   }
   act+='<button class="btn btn-outline" onclick="closeModal()">閉じる</button>';
@@ -749,6 +751,20 @@ async function saveEditReservation(id){
   const phone=document.getElementById('editRPhone').value.trim();
   const note=document.getElementById('editRNote').value.trim();
   if(!date||!time||!name||!menu){toast('日付・時間・名前・メニューは必須です');return}
+  // 休業日・定休日チェック
+  const warns=[];
+  const targetDate=new Date(date);
+  const wdNames=['日','月','火','水','木','金','土'];
+  const closedStr=settings.closedDays||'';
+  if(closedStr&&closedStr.includes(wdNames[targetDate.getDay()])){
+    warns.push('「'+wdNames[targetDate.getDay()]+'曜日」は定休日です');
+  }
+  if(holidays.find(h=>h.date===date)){
+    warns.push('この日は休業日に設定されています');
+  }
+  if(warns.length>0){
+    if(!confirm('⚠️ '+warns.join('\n')+'\n\nこの日に予約を変更しますか？')){return}
+  }
   const [hh,mm]=time.split(':').map(Number);
   const endMin=hh*60+mm+duration;
   const endTime=(''+(endMin/60|0)).padStart(2,'0')+':'+(''+(endMin%60)).padStart(2,'0');
@@ -899,6 +915,14 @@ async function saveReservation(){
   const phone=document.getElementById('addPhone').value.trim(),note=document.getElementById('addNote').value.trim();
   const price=parseInt(document.getElementById('addPrice').value)||0;
   if(!date||!time||!name||!menu){toast('日付・時間・名前・メニューは必須です');return}
+  // 休業日・定休日チェック
+  const addWarns=[];
+  const addDate=new Date(date);
+  const addWd=['日','月','火','水','木','金','土'];
+  const addClosed=settings.closedDays||'';
+  if(addClosed&&addClosed.includes(addWd[addDate.getDay()])){addWarns.push('「'+addWd[addDate.getDay()]+'曜日」は定休日です')}
+  if(holidays.find(h=>h.date===date)){addWarns.push('この日は休業日に設定されています')}
+  if(addWarns.length>0&&!confirm('⚠️ '+addWarns.join('\n')+'\n\nこの日に予約を追加しますか？')){return}
   const [hh,mm]=time.split(':').map(Number);
   const endMin=hh*60+mm+duration;
   const endTime=(''+(endMin/60|0)).padStart(2,'0')+':'+(''+(endMin%60)).padStart(2,'0');
