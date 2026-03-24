@@ -73,6 +73,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
 .cal-event.ev-manual{background:#ff9800;color:#fff}
 .cal-event.ev-block{background:#e0e0e0;color:#999}
 
+/* ===== MENU ===== */
+.menu-item{background:#fff;border-radius:14px;padding:.8rem 1rem;margin-bottom:.6rem;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:.8rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.menu-item:active{transform:scale(.98)}
+.menu-item.disabled{opacity:.5}
+.menu-thumb{width:56px;height:56px;border-radius:10px;background:#f0f0f2;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:1.5rem}
+.menu-thumb img{width:100%;height:100%;object-fit:cover}
+.menu-info{flex:1;min-width:0}
+.menu-name{font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-meta{font-size:.78rem;color:#86868b;margin-top:2px}
+.menu-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:4px}
+.badge-on{background:#e8f5e9;color:#2e7d32}
+.badge-off{background:#f5f5f5;color:#999}
+.badge-popular{background:#fff3e0;color:#e65100}
+.cat-header{font-size:.85rem;font-weight:700;color:#86868b;padding:.8rem 0 .4rem;display:flex;align-items:center;gap:.5rem}
+.cat-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.cat-icon.pink{background:#fce4ec}.cat-icon.amber{background:#fff3e0}.cat-icon.blue{background:#e3f2fd}.cat-icon.green{background:#e8f5e9}
+.fab{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0));right:1rem;width:56px;height:56px;border-radius:50%;background:#06C755;color:#fff;border:none;font-size:1.8rem;box-shadow:0 4px 12px rgba(6,199,85,.4);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:90;-webkit-tap-highlight-color:transparent}
+.fab:active{transform:scale(.9)}
+.edit-panel{position:fixed;inset:0;background:#f5f5f7;z-index:250;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.edit-panel.open{transform:translateX(0)}
+.edit-header{display:flex;align-items:center;gap:.8rem;padding:1rem;background:#fff;border-bottom:1px solid #e5e5ea;position:sticky;top:0;z-index:10}
+.edit-body{padding:1rem}
+.photo-upload-area{width:100%;aspect-ratio:1;border-radius:14px;background:#f0f0f2;overflow:hidden;position:relative;cursor:pointer}
+.photo-upload-area .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#86868b}
+.photo-upload-area .placeholder .icon{font-size:3rem;margin-bottom:.5rem}
+.photo-upload-area img{width:100%;height:100%;object-fit:cover}
+.photo-upload-area .overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;opacity:0;transition:opacity .2s}
+.photo-upload-area:active .overlay{opacity:1}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0}
+.toggle-label{font-size:.9rem}
+.toggle-switch{width:50px;height:28px;border-radius:14px;background:#d1d1d6;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-switch.on{background:#06C755}
+.toggle-switch.on::after{transform:translateX(22px)}
+.select-field{width:100%;padding:.7rem .8rem;border:1px solid #d1d1d6;border-radius:10px;font-size:.95rem;font-family:inherit;background:#fff;-webkit-appearance:none;appearance:none}
+body.no-scroll{overflow:hidden}
+.action-bar{position:fixed;bottom:0;left:0;right:0;padding:1rem;background:#fff;border-top:1px solid #e5e5ea;display:flex;gap:.5rem;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0));z-index:260}
+.delete-confirm{background:#fce4ec;border-radius:10px;padding:1rem;margin-top:.5rem}
+.delete-confirm p{font-size:.85rem;color:#c62828;margin-bottom:.8rem}
+.delete-confirm .btns{display:flex;gap:.5rem}
+
 /* ===== MODAL ===== */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
@@ -194,6 +235,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
     <div id="resList"></div>
   </div>
 
+  <!-- メニュー管理 -->
+  <div class="page" id="pageMenu">
+    <div class="section-title">メニュー一覧</div>
+    <div id="menuListContainer"></div>
+  </div>
+  <button class="fab" id="fabMenu" onclick="openNewMenu()">＋</button>
+
   <!-- 設定 -->
   <div class="page" id="pageSettings">
     <div class="section-title">サロン情報</div>
@@ -225,6 +273,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
     <button class="nav-item active" onclick="showPage('Home',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>ホーム</button>
     <button class="nav-item" onclick="showPage('Schedule',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>スケジュール</button>
     <button class="nav-item" onclick="showPage('List',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>予約一覧</button>
+    <button class="nav-item" onclick="showPage('Menu',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>メニュー</button>
     <button class="nav-item" onclick="showPage('Settings',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>設定</button>
   </nav>
 </div>
@@ -235,6 +284,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku
     <h2 id="modalTitle"></h2>
     <div id="modalBody"></div>
     <div id="modalActions" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
+<!-- MENU EDIT PANEL -->
+<div id="editPanel" class="edit-panel">
+  <div class="edit-header">
+    <button class="btn btn-outline" style="width:auto;padding:8px 14px;margin-top:0;" onclick="closeEdit()">✕ 戻る</button>
+    <h2 id="editTitle" style="font-size:1.1rem;font-weight:700;margin:0;">メニュー編集</h2>
+  </div>
+  <div class="edit-body" style="padding-bottom:calc(100px + env(safe-area-inset-bottom));">
+    <div class="form-group">
+      <label class="form-label">写真</label>
+      <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+        <div class="placeholder" id="photoPlaceholder"><div class="icon">📷</div><div class="text">タップして写真を選択</div></div>
+        <img id="photoPreview" style="display:none">
+        <div class="overlay"><div style="font-size:24px;">📷</div><div style="font-size:.85rem;font-weight:600;">写真を変更</div></div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+      <div style="font-size:.75rem;color:#86868b;margin-top:.3rem;">推奨: 正方形の写真（1:1）</div>
+    </div>
+    <div class="form-group"><label class="form-label">メニュー名</label><input class="form-input" type="text" id="editName" placeholder="例: マオジェル ワンカラー"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">料金（税込）</label><input class="form-input" type="number" id="editPrice" placeholder="8000" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label">所要時間（分）</label><input class="form-input" type="number" id="editMinutes" placeholder="90" inputmode="numeric"></div>
+    </div>
+    <div class="form-group"><label class="form-label">説明文</label><input class="form-input" type="text" id="editDesc" placeholder="例: ドライケア込・フィルイン対応"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">カテゴリ</label><select class="select-field" id="editCategory"><option value="人気メニュー">人気メニュー</option><option value="マオジェルメニュー">マオジェルメニュー</option><option value="デザインメニュー">デザインメニュー</option><option value="オフ">オフ</option></select></div>
+      <div class="form-group"><label class="form-label">タイプ</label><select class="select-field" id="editType"><option value="main">メイン施術</option><option value="off">オフ（付け替え）</option></select></div>
+    </div>
+    <div class="form-group">
+      <div class="toggle-row"><span class="toggle-label">メニューを表示する</span><div class="toggle-switch" id="toggleEnabled" onclick="toggleSwitch(this)"></div></div>
+      <div class="toggle-row"><span class="toggle-label">人気バッジを表示</span><div class="toggle-switch" id="togglePopular" onclick="toggleSwitch(this)"></div></div>
+    </div>
+    <div class="form-group"><label class="form-label">表示順</label><input class="form-input" type="number" id="editSort" placeholder="1" inputmode="numeric" style="width:100px;"><div style="font-size:.75rem;color:#86868b;margin-top:.2rem;">小さい数字ほど上に表示</div></div>
+    <div id="deleteSection" style="margin-top:2rem;">
+      <button class="btn btn-outline" style="color:#ff3b30;border-color:#ff3b30;width:auto;margin-top:0;" onclick="showDeleteConfirm()">このメニューを削除</button>
+      <div id="deleteConfirm" class="delete-confirm" style="display:none"><p>本当に削除しますか？この操作は取り消せません。</p><div class="btns"><button class="btn btn-outline" style="flex:1;margin-top:0;" onclick="hideDeleteConfirm()">キャンセル</button><button class="btn btn-danger" style="flex:1;margin-top:0;" onclick="doDeleteMenu()">削除する</button></div></div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn btn-outline" style="flex:1;margin-top:0;" onclick="closeEdit()">キャンセル</button>
+    <button class="btn btn-primary" style="flex:2;margin-top:0;" onclick="saveMenu()">保存する</button>
   </div>
 </div>
 
@@ -268,6 +360,11 @@ let settings={};
 let currentFilter='all';
 let nextId=100;
 let nextBlockId=100;
+let menus=[];
+let editingMenu=null;
+let newPhotoData=null;
+let newPhotoMime=null;
+let isNewMenu=false;
 
 function init(){
   const p=new URLSearchParams(location.search);
@@ -742,7 +839,7 @@ async function saveReservation(){
 
 // ===== MODAL / NAV / TOAST / UTIL =====
 function closeModal(e){if(e&&e.target!==document.getElementById('modalOverlay'))return;document.getElementById('modalOverlay').classList.remove('open')}
-function showPage(n,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));document.getElementById('page'+n).classList.add('active');btn.classList.add('active');if(n==='Schedule'){viewDate=new Date();renderSchedule()}}
+function showPage(n,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));document.getElementById('page'+n).classList.add('active');btn.classList.add('active');document.getElementById('fabMenu').style.display=n==='Menu'?'flex':'none';if(n==='Schedule'){viewDate=new Date();renderSchedule()}if(n==='Menu'&&menus.length===0)loadMenus()}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)}
 function exportCSV(){
   const h=['日付','時間','終了','名前','メニュー','所要時間','金額','ステータス','予約経路','電話番号','メモ','顧客メモ'];
@@ -752,6 +849,204 @@ function exportCSV(){
   a.download='予約データ_'+fmtDate(new Date())+'.csv';a.click();toast('CSVをダウンロードしました');
 }
 function fmtDate(d){return d.getFullYear()+'-'+(''+(d.getMonth()+1)).padStart(2,'0')+'-'+(''+ d.getDate()).padStart(2,'0')}
+
+// ===== MENU MANAGEMENT =====
+function loadMenus(){
+  if(!GAS_URL){
+    // Demo mode
+    if(menus.length===0){
+      menus=[
+        {menuId:'m1',label:'マオジェル ワンカラー',price:8000,minutes:90,type:'main',category:'マオジェルメニュー',imageUrl:'',description:'マオジェルを使用したワンカラーネイル。発色が良く持ちも抜群です。',sortOrder:1,enabled:true,popular:true},
+        {menuId:'m2',label:'マグネット/フラッシュネイル',price:7980,minutes:90,type:'main',category:'デザインメニュー',imageUrl:'',description:'トレンドのマグネットネイル。光の角度で輝きが変わります。',sortOrder:2,enabled:true,popular:true},
+        {menuId:'m3',label:'シンプルネイル',price:7980,minutes:90,type:'main',category:'デザインメニュー',imageUrl:'',description:'シンプルで上品なデザイン。オフィスにもぴったり。',sortOrder:3,enabled:true,popular:false},
+        {menuId:'m4',label:'ワンカラー',price:7700,minutes:90,type:'main',category:'人気メニュー',imageUrl:'',description:'お好きなカラーで統一。定番の人気メニューです。',sortOrder:4,enabled:true,popular:true},
+        {menuId:'m5',label:'お得なマオセット',price:10500,minutes:90,type:'main',category:'マオジェルメニュー',imageUrl:'',description:'マオジェルのお得なセットメニュー。',sortOrder:5,enabled:true,popular:false},
+        {menuId:'m6',label:'マオジェル 花びらネイル',price:11000,minutes:90,type:'main',category:'マオジェルメニュー',imageUrl:'',description:'花びらのような繊細なアートが美しいデザイン。',sortOrder:6,enabled:true,popular:false},
+        {menuId:'m7',label:'自店オフ',price:0,minutes:0,type:'off',category:'オフ',imageUrl:'',description:'当店で施術したジェルのオフ。',sortOrder:20,enabled:true,popular:false},
+        {menuId:'m8',label:'他店オフ',price:0,minutes:0,type:'off',category:'オフ',imageUrl:'',description:'他店で施術したジェルのオフ。',sortOrder:21,enabled:true,popular:false},
+        {menuId:'m9',label:'yorunail風ガラスフレンチ',price:9900,minutes:90,type:'main',category:'デザインメニュー',imageUrl:'',description:'当店オリジナルのガラスフレンチデザイン。',sortOrder:7,enabled:false,popular:false}
+      ];
+    }
+    renderMenuList();
+    return;
+  }
+  fetch(GAS_URL+'?action=getMenus&token='+AUTH_TOKEN).then(r=>r.json()).then(res=>{
+    if(res.success){
+      menus=res.data.menus||[];
+      menus.sort((a,b)=>(a.sortOrder||99)-(b.sortOrder||99));
+      renderMenuList();
+    } else { toast(res.error||'メニュー読み込み失敗'); }
+  }).catch(()=>toast('メニュー読み込みエラー'));
+}
+
+function renderMenuList(){
+  const c=document.getElementById('menuListContainer');
+  if(!menus||!menus.length){
+    c.innerHTML='<div class="empty-state" style="text-align:center;padding:3rem 1rem;color:#86868b;"><div style="font-size:2rem;margin-bottom:.5rem;">📋</div><div style="font-weight:600;">メニューがありません</div><div style="font-size:.85rem;margin-top:.3rem;">右下の＋ボタンから追加してください</div></div>';
+    return;
+  }
+  const categories={};
+  const catOrder=['人気メニュー','マオジェルメニュー','デザインメニュー','オフ','その他'];
+  const catIcons={'人気メニュー':'💅','マオジェルメニュー':'✨','デザインメニュー':'🎨','オフ':'🔄','その他':'📋'};
+  menus.forEach(m=>{
+    const cat=m.category||'その他';
+    if(!categories[cat]) categories[cat]=[];
+    categories[cat].push(m);
+  });
+  let html='';
+  catOrder.forEach(cat=>{
+    const items=categories[cat];
+    if(!items||!items.length) return;
+    html+='<div style="display:flex;align-items:center;gap:.5rem;margin:1.2rem 0 .5rem;"><div style="width:28px;height:28px;border-radius:8px;background:#f0faf3;display:flex;align-items:center;justify-content:center;font-size:.85rem;">'+(catIcons[cat]||'📋')+'</div><span style="font-size:.8rem;font-weight:700;color:#86868b;">'+cat+' ('+items.length+')</span></div>';
+    items.forEach(m=>{
+      const disabled=!m.enabled?' style="opacity:.5"':'';
+      const thumb=m.imageUrl?'<img src="'+m.imageUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" onerror="this.parentElement.textContent=\'📷\'">':'📷';
+      let badges='';
+      if(m.enabled) badges+='<span style="display:inline-block;font-size:.65rem;padding:1px 6px;border-radius:4px;background:#e8f5e9;color:#2e7d32;font-weight:600;">表示中</span> ';
+      else badges+='<span style="display:inline-block;font-size:.65rem;padding:1px 6px;border-radius:4px;background:#f5f5f5;color:#999;font-weight:600;">非表示</span> ';
+      if(m.popular) badges+='<span style="display:inline-block;font-size:.65rem;padding:1px 6px;border-radius:4px;background:#fff3e0;color:#e65100;font-weight:600;">人気</span>';
+      html+='<div class="menu-item"'+disabled+' onclick="openEdit(menus.find(x=>x.menuId===\''+m.menuId+'\'))">'
+        +'<div class="menu-thumb">'+thumb+'</div>'
+        +'<div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m.label+'</div>'
+        +'<div style="font-size:.8rem;color:#86868b;margin-top:2px;">¥'+(m.price||0).toLocaleString()+' / '+(m.minutes||0)+'分</div>'
+        +'<div style="margin-top:3px;">'+badges+'</div></div>'
+        +'<div style="color:#c7c7cc;font-size:.75rem;flex-shrink:0;">▶</div></div>';
+    });
+  });
+  c.innerHTML=html;
+}
+
+function openEdit(m){
+  if(!m) return;
+  editingMenu=JSON.parse(JSON.stringify(m));
+  isNewMenu=false;
+  newPhotoData=null;newPhotoMime=null;
+  document.getElementById('editTitle').textContent='メニュー編集';
+  document.getElementById('editName').value=m.label||'';
+  document.getElementById('editPrice').value=m.price||'';
+  document.getElementById('editMinutes').value=m.minutes||'';
+  document.getElementById('editDesc').value=m.description||'';
+  document.getElementById('editCategory').value=m.category||'人気メニュー';
+  document.getElementById('editType').value=m.type||'main';
+  document.getElementById('editSort').value=m.sortOrder||'';
+  document.getElementById('toggleEnabled').classList.toggle('on',!!m.enabled);
+  document.getElementById('togglePopular').classList.toggle('on',!!m.popular);
+  const preview=document.getElementById('photoPreview'),ph=document.getElementById('photoPlaceholder');
+  if(m.imageUrl){preview.src=m.imageUrl;preview.style.display='block';ph.style.display='none'}
+  else{preview.style.display='none';ph.style.display='flex'}
+  document.getElementById('deleteSection').style.display='block';
+  hideDeleteConfirm();
+  document.getElementById('editPanel').classList.add('open');
+  document.body.classList.add('no-scroll');
+}
+
+function openNewMenu(){
+  editingMenu={menuId:'menu_'+Date.now(),label:'',price:0,minutes:90,type:'main',category:'人気メニュー',imageUrl:'',description:'',sortOrder:menus.length+1,enabled:true,popular:false};
+  isNewMenu=true;newPhotoData=null;newPhotoMime=null;
+  document.getElementById('editTitle').textContent='新規メニュー追加';
+  document.getElementById('editName').value='';
+  document.getElementById('editPrice').value='';
+  document.getElementById('editMinutes').value='90';
+  document.getElementById('editDesc').value='';
+  document.getElementById('editCategory').value='人気メニュー';
+  document.getElementById('editType').value='main';
+  document.getElementById('editSort').value=editingMenu.sortOrder;
+  document.getElementById('toggleEnabled').classList.add('on');
+  document.getElementById('togglePopular').classList.remove('on');
+  document.getElementById('photoPreview').style.display='none';
+  document.getElementById('photoPlaceholder').style.display='flex';
+  document.getElementById('deleteSection').style.display='none';
+  document.getElementById('editPanel').classList.add('open');
+  document.body.classList.add('no-scroll');
+}
+
+function closeEdit(){
+  document.getElementById('editPanel').classList.remove('open');
+  document.body.classList.remove('no-scroll');
+  editingMenu=null;
+}
+
+function toggleSwitch(el){ el.classList.toggle('on'); }
+
+function onPhotoSelected(e){
+  const file=e.target.files[0];if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const img=new Image();
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      const maxSz=800;
+      let w=img.width,h=img.height;
+      if(w>maxSz||h>maxSz){if(w>h){h=Math.round(h*maxSz/w);w=maxSz}else{w=Math.round(w*maxSz/h);h=maxSz}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.85);
+      newPhotoData=dataUrl.split(',')[1];newPhotoMime='image/jpeg';
+      document.getElementById('photoPreview').src=dataUrl;
+      document.getElementById('photoPreview').style.display='block';
+      document.getElementById('photoPlaceholder').style.display='none';
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveMenu(){
+  if(!editingMenu) return;
+  const name=document.getElementById('editName').value.trim();
+  if(!name){toast('メニュー名を入力してください');return}
+  const price=parseInt(document.getElementById('editPrice').value)||0;
+  const minutes=parseInt(document.getElementById('editMinutes').value)||0;
+  const desc=document.getElementById('editDesc').value.trim();
+  const category=document.getElementById('editCategory').value;
+  const type=document.getElementById('editType').value;
+  const sort=parseInt(document.getElementById('editSort').value)||1;
+  const enabled=document.getElementById('toggleEnabled').classList.contains('on');
+  const popular=document.getElementById('togglePopular').classList.contains('on');
+  const updates={label:name,price,minutes,description:desc,category,type,sortOrder:sort,enabled,popular};
+
+  if(!GAS_URL){
+    // Demo mode: update local array
+    Object.assign(editingMenu,updates);
+    if(isNewMenu){menus.push(editingMenu)}
+    else{const idx=menus.findIndex(m=>m.menuId===editingMenu.menuId);if(idx>=0) Object.assign(menus[idx],updates)}
+    menus.sort((a,b)=>(a.sortOrder||99)-(b.sortOrder||99));
+    closeEdit();renderMenuList();toast('保存しました（デモ）');return;
+  }
+
+  try{
+    // Upload photo first if changed
+    if(newPhotoData){
+      toast('写真をアップロード中...');
+      const pRes=await menuApiPost({action:'uploadImage',menuId:editingMenu.menuId,imageData:newPhotoData,mimeType:newPhotoMime});
+      if(pRes.success) updates.imageUrl=pRes.data.imageUrl;
+      else toast('写真アップロード失敗');
+    }
+    const res=await menuApiPost({action:'updateMenu',menuId:editingMenu.menuId,isNew:isNewMenu,updates});
+    if(res.success){toast('保存しました');closeEdit();loadMenus()}
+    else toast('保存失敗: '+(res.error||''));
+  }catch(e){toast('通信エラー');console.error(e)}
+}
+
+function showDeleteConfirm(){document.getElementById('deleteConfirm').style.display='block'}
+function hideDeleteConfirm(){document.getElementById('deleteConfirm').style.display='none'}
+
+async function doDeleteMenu(){
+  if(!editingMenu) return;
+  if(!GAS_URL){
+    menus=menus.filter(m=>m.menuId!==editingMenu.menuId);
+    closeEdit();renderMenuList();toast('削除しました（デモ）');return;
+  }
+  try{
+    const res=await menuApiPost({action:'deleteMenu',menuId:editingMenu.menuId});
+    if(res.success){toast('削除しました');closeEdit();loadMenus()}
+    else toast('削除失敗: '+(res.error||''));
+  }catch(e){toast('通信エラー')}
+}
+
+function menuApiPost(body){
+  return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({token:AUTH_TOKEN},body))}).then(r=>r.json());
+}
 
 init();
 </script>
