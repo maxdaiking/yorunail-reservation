@@ -139,7 +139,7 @@ body.no-scroll{overflow:hidden}
 .form-label{display:block;font-size:.8rem;font-weight:600;color:#86868b;margin-bottom:.3rem}
 .form-input{width:100%;padding:.7rem .8rem;border:1px solid #d1d1d6;border-radius:10px;font-size:.95rem;font-family:inherit;background:#fff;-webkit-appearance:none;appearance:none}
 .form-input:focus{outline:none;border-color:#06C755;box-shadow:0 0 0 3px rgba(6,199,85,.15)}
-.form-textarea{min-height:70px;resize:vertical}
+.form-textarea{min-height:80px;resize:vertical;line-height:1.5}
 .form-row{display:flex;gap:.5rem}
 .form-row .form-group{flex:1}
 .dur-btn{padding:.5rem .9rem;border:1px solid #d1d1d6;border-radius:10px;background:#fff;font-size:.9rem;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -309,7 +309,7 @@ body.no-scroll{overflow:hidden}
       <div class="form-group"><label class="form-label">料金（税込）</label><input class="form-input" type="number" id="editPrice" placeholder="8000" inputmode="numeric"></div>
       <div class="form-group"><label class="form-label">所要時間（分）</label><input class="form-input" type="number" id="editMinutes" placeholder="90" inputmode="numeric"></div>
     </div>
-    <div class="form-group"><label class="form-label">説明文</label><input class="form-input" type="text" id="editDesc" placeholder="例: ドライケア込・フィルイン対応"></div>
+    <div class="form-group"><label class="form-label">説明文</label><textarea class="form-input form-textarea" id="editDesc" rows="3" placeholder="例: ドライケア込・フィルイン対応"></textarea></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">カテゴリ</label><select class="select-field" id="editCategory"><option value="人気メニュー">人気メニュー</option><option value="マオジェルメニュー">マオジェルメニュー</option><option value="デザインメニュー">デザインメニュー</option><option value="オフ">オフ</option></select></div>
       <div class="form-group"><label class="form-label">タイプ</label><select class="select-field" id="editType"><option value="main">メイン施術</option><option value="off">オフ（付け替え）</option></select></div>
